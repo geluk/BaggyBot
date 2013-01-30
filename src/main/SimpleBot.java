@@ -42,10 +42,22 @@ public class SimpleBot extends PircBot{
 	public SimpleBot(){
 		String name = SettingsManager.getInstance().getSetting("nick");
 		String login = SettingsManager.getInstance().getSetting("ident");
-		int port = Integer.parseInt(SettingsManager.getInstance().getSetting("sqlport"));
+		String port = SettingsManager.getInstance().getSetting("sqlport");
 		String host = SettingsManager.getInstance().getSetting("sqlhost");
 		String user = SettingsManager.getInstance().getSetting("sqluser");
 		String pass = SettingsManager.getInstance().getSetting("sqlpass");
+		
+		if(name.equals("") || login.equals("") || port.equals("") || host.equals("") || user.equals("") || pass.equals("")){
+			System.out.println("Please make sure you've entered the bot settings in your settings file. Bot will now shut down.");
+			System.exit(0);
+		}
+		int iPort = 0;
+		try{
+			iPort = Integer.parseInt(port);
+		}catch(NumberFormatException e){
+			System.out.println("Please check your settings file. The 'Port' setting may only contain numbers. Bot will now shut down.");
+			System.exit(0);
+		}
 		
 		System.out.println("\t IRC Server:\tirc.esper.net");
 		System.out.println("\t IRC Nick:\t" + name);
@@ -61,7 +73,7 @@ public class SimpleBot extends PircBot{
 		this.setName(name);
 		this.setLogin(login);
 		
-		SqlConnector.getInstance().connect(host, port, user, pass, "stats_bot");
+		SqlConnector.getInstance().connect(host, iPort, user, pass, "stats_bot");
 		
 		ch = new CommandHandler();
 		
@@ -69,9 +81,12 @@ public class SimpleBot extends PircBot{
 	}	
 	// Gets executed whenever an IRC message is sent
 	public void onMessage(String channel, String sender, String login, String hostname, String message){
+		// Process the line as a command if it starts with the command identifier or, if cadbury mode is enabled, the $ character.
 		if(message.startsWith(commandIdentifier) || (cadburyMode && message.startsWith("$"))){
 			ch.processCommand(channel, sender, login, hostname, message);
-		}else if(!message.startsWith("$")){
+		}
+		// Only update statistics for lines that are not Cadbury commands
+		else if(!message.startsWith("$")){
 			StatsHandler.getInstance().processMessage(channel, sender, login, hostname, message);
 		}
 	}
