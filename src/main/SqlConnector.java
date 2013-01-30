@@ -145,6 +145,9 @@ public class SqlConnector {
 		SqlConnector.getInstance().sendQuery("UPDATE " + table + " SET `" + column + "` = `" + column+ "` + 1 WHERE " + primary + " = '" + primaryValue+ "'");
 
 	}
+	public void tryIncrementVaria(String key){
+		tryIncrement("varia", "`key`", key, "value", "'" + key + "', 1");
+	}
 
 	// Increments a value in a column behind the primary key with value
 	// 'primaryValue', and creates the primary key if it doens't exist yet.

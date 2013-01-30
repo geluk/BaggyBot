@@ -18,7 +18,7 @@ public class SimpleBot extends PircBot{
 	
 	// The current version of the bot. Only increment this each time there is a release.
 	// Convention: (milestone).(major)[.(minor).[(revision/bugfix)]]
-	public static final String version = "1.4.0.3";
+	public static final String version = "1.5";
 	
 	// More debug output?
 	private static final boolean verbose = false;
@@ -78,7 +78,11 @@ public class SimpleBot extends PircBot{
 		ch = new CommandHandler();
 		
 		instance = this;
-	}	
+	}
+	public void onAction(String sender, String login, String hostname, String target, String action){
+		StatsHandler.getInstance().processAction(sender,login,hostname,target,action);
+	}
+	
 	// Gets executed whenever an IRC message is sent
 	public void onMessage(String channel, String sender, String login, String hostname, String message){
 		// Process the line as a command if it starts with the command identifier or, if cadbury mode is enabled, the $ character.

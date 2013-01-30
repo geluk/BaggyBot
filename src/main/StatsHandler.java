@@ -33,6 +33,12 @@ public class StatsHandler {
 
 	public void processMessage(String channel, String sender, String login, String hostname, String message) {
 		incrementLineCount(login);
+		SqlConnector.getInstance().tryIncrementVaria("global_line_count");
+		if(message.endsWith("!")){
+			SqlConnector.getInstance().tryIncrement("users", "nick", login, "exclamations", "'" + login + "', 0, 0, 0, 1, 0, 0, 0, 0, 0, ''");
+		}else if(message.endsWith("?")){
+			SqlConnector.getInstance().tryIncrement("users", "nick", login, "questions", "'" + login + "', 0, 0, 1, 0, 0, 0, 0, 0, 0, ''");
+		}
 		processAlts(login, sender);
 		String[] words = message.split(" ");
 		if(words.length > 6){
@@ -150,5 +156,10 @@ public class StatsHandler {
 
 	private boolean isArticle(String word) {
 		return (word.equals("the") || word.equals("an") || word.equals("a"));
+	}
+
+	public void processAction(String sender, String login, String hostname, String target, String action) {
+		SqlConnector.getInstance().tryIncrementVaria("global_action_count");
+		SqlConnector.getInstance().tryIncrement("users", "nick", login, "actions", "'" + login + "', 0, 1, 0, 0, 0, 0, 0, 0, 0, ''");
 	}
 }
