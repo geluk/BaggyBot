@@ -40,6 +40,7 @@ public class StatsHandler {
 		String[] words = message.split(" ");
 		if(words.length > 6){
 			if(Math.random() < 0.05){
+				SimpleBot.instance.sendMessage(channel, "Snagged!");
 				setRandomQuote(login, message);
 			}
 		}
@@ -48,13 +49,13 @@ public class StatsHandler {
 	}
 
 	private void setRandomQuote(String login, String message) {
-		SqlConnector.getInstance().sendQuery("UPDATE users SET random_quote = '" + message + "'");
+		SqlConnector.getInstance().sendQuery("UPDATE users SET random_quote = '" + message + "' WHERE nick = '" + login + "'");
 	}
 
 	private void processAlts(String login, String sender) {
 		String dbLogin = SqlConnector.getInstance().sendSelectQuery("SELECT login FROM alts WHERE `login` = '" + login + "'");
-		System.out.println("Dblogin = " + dbLogin);
 		if(dbLogin.equals("") || dbLogin == null){
+			System.out.println("Creating new alt for " + login + ". Primary: " + sender);
 			SqlConnector.getInstance().sendQuery("INSERT INTO alts VALUES ('" + login + "', '" + sender + "', '')");
 		}else{
 			String primaryNick = SqlConnector.getInstance().sendSelectQuery("SELECT `primary` FROM alts WHERE login = '" + login + "'");
@@ -91,7 +92,7 @@ public class StatsHandler {
 				if (!sender.equals(word) && !sender.equals("Cadbury") && word.replaceAll("$|,|:", "").equalsIgnoreCase(nick)) {
 					nickCount++;
 					if(nickCount < 3){
-						String pingedLogin = SqlConnector.getInstance().sendSelectQuery("SELECT login FROM alts WHERE (primary = '" + nick + "' OR additional LIKE '%" + nick + "'%");
+						String pingedLogin = SqlConnector.getInstance().sendSelectQuery("SELECT login FROM alts WHERE (primary = '" + nick + "' OR additional LIKE '%" + nick + "%')");
 						if(pingedLogin.equals("") || pingedLogin == null){
 							//Unable to retrieve the login of the person who was pinged
 						}else{

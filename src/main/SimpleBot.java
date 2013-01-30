@@ -47,7 +47,7 @@ public class SimpleBot extends PircBot{
 		String user = SettingsManager.getInstance().getSetting("sqluser");
 		String pass = SettingsManager.getInstance().getSetting("sqlpass");
 		
-		if(name.equals("") || login.equals("") || port.equals("") || host.equals("") || user.equals("") || pass.equals("")){
+		if(name.equals("") || login.equals("") || port.equals("") || host.equals("") || user.equals("")){
 			System.out.println("Please make sure you've entered the bot settings in your settings file. Bot will now shut down.");
 			System.exit(0);
 		}
