@@ -57,10 +57,14 @@ public class SqlConnector {
 	public String sendSelectQuery(String query){
 		String[] results = sendSelectQueryArr(query);
 		String result = "";
-		for(String var : results){
-			result = result.concat(", " + var);
+		for(int i = 0; i < results.length; i++){
+			if(i == 0){
+				result = results[i];
+			}else{
+				result = result.concat(", " + results[i]);
+			}
 		}
-		return result.substring(2);
+		return result;
 	}
 	// Adds an exception to the list of unread exceptions.
 	private void registerException(Exception e){

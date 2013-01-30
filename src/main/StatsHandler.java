@@ -34,20 +34,30 @@ public class StatsHandler {
 		incrementLineCount(login);
 		processAlts(login, sender);
 		String[] words = message.split(" ");
+		if(words.length > 6){
+			if(/*Math.random() < 0.1*/ true){
+				setRandomQuote(login, message);
+			}
+		}
 		processEmoticons(channel, sender, login, hostname, message, words);
 		processWords(channel, sender, login, hostname, message, words);
 	}
 
+	private void setRandomQuote(String login, String message) {
+		SqlConnector.getInstance().sendQuery("UPDATE users SET random_quote = '" + message + "'");
+	}
+
 	private void processAlts(String login, String sender) {
-		String dbLogin = SqlConnector.getInstance().sendSelectQuery("SELECT login FROM alts WHERE primary = '" + sender + "'");
+		String dbLogin = SqlConnector.getInstance().sendSelectQuery("SELECT login FROM alts WHERE `login` = '" + login + "'");
+		System.out.println("Dblogin = " + dbLogin);
 		if(dbLogin.equals("") || dbLogin == null){
-			SqlConnector.getInstance().sendQuery("INSERT INTO alts VALUES ('" + login + "', '" + sender + "', ''");
+			SqlConnector.getInstance().sendQuery("INSERT INTO alts VALUES ('" + login + "', '" + sender + "', '')");
 		}else{
-			String primaryNick = SqlConnector.getInstance().sendSelectQuery("SELECT primary FROM alts WHERE login = '" + login + "'");
+			String primaryNick = SqlConnector.getInstance().sendSelectQuery("SELECT `primary` FROM alts WHERE login = '" + login + "'");
 			if(!sender.equals(primaryNick)){
-				String altNicks = SqlConnector.getInstance().sendSelectQuery("SELECT additional FROM alts WHERE login = '" + login + "'");
+				String altNicks = SqlConnector.getInstance().sendSelectQuery("SELECT `additional` FROM alts WHERE login = '" + login + "'");
 				if(!altNicks.contains(sender.toLowerCase())){
-					SqlConnector.getInstance().sendQuery("UPDATE alts SET additional = additional + '," + sender.toLowerCase() + "' WHERE login = '" + login + "'");
+					SqlConnector.getInstance().sendQuery("UPDATE alts SET additional = CONCAT_WS(',', additional, '" + sender.toLowerCase() + "') WHERE login = '" + login + "'");
 				}
 			}
 		}
@@ -67,7 +77,7 @@ public class StatsHandler {
 	private void processWords(String channel, String sender, String login, String hostname, String message, String[] words) {
 		User[] users = SimpleBot.instance.getUsers(channel);
 		
-		SqlConnector.getInstance().tryIncrement("users", "nick", login, "words", words.length, "'"+ sender + "', 0, 0, 0, 0, 0, 0, 0, 0, " + words.length);
+		SqlConnector.getInstance().tryIncrement("users", "nick", login, "words", words.length, "'"+ sender + "', 0, 0, 0, 0, 0, 0, 0, 0, " + words.length + ", ''");
 		
 		int nickCount = 0;
 		for (String word : words) {
@@ -81,7 +91,7 @@ public class StatsHandler {
 						if(pingedLogin.equals("") || pingedLogin == null){
 							//Unable to retrieve the login of the person who was pinged
 						}else{
-							SqlConnector.getInstance().tryIncrement("users", "nick", pingedLogin, "pings", "'" + nick + "', 1, 0, 0, 0, 0, 0, 0, 0");
+							SqlConnector.getInstance().tryIncrement("users", "nick", pingedLogin, "pings", "'" + nick + "', 1, 0, 0, 0, 0, 0, 0, 0, ''");
 						}
 						
 					}
@@ -127,7 +137,7 @@ public class StatsHandler {
 	}
 
 	private void incrementLineCount(String nick) {
-		SqlConnector.getInstance().tryIncrement("users", "nick", nick, "lines", "'" + nick + "', 0, 0, 0, 0, 0, 0, 0, 1, 0");
+		SqlConnector.getInstance().tryIncrement("users", "nick", nick, "lines", "'" + nick + "', 0, 0, 0, 0, 0, 0, 0, 1, 0, ''");
 	}
 
 	private boolean isConjunction(String word) {
