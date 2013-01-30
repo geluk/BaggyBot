@@ -31,7 +31,7 @@ public class CommandHandler {
 				//processGoogleImageSearch(channel,sender,command);
 			}
 		}
-		if(command.startsWith("ed")){
+		if(command.startsWith("ed") && authorize(channel,login,hostname)){
 			if(SimpleBot.instance.unreadExceptions.size() > 0){
 				SimpleBot.instance.sendMessage(channel, "Last exception details: " + SimpleBot.instance.unreadExceptions.get(0));
 				SimpleBot.instance.unreadExceptions.remove(0);

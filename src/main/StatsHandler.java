@@ -89,7 +89,7 @@ public class StatsHandler {
 				if (!sender.equals(word) && !sender.equals("Cadbury") && word.replaceAll("$|,|:", "").equalsIgnoreCase(nick)) {
 					nickCount++;
 					if(nickCount < 3){
-						String pingedLogin = SqlConnector.getInstance().sendSelectQuery("SELECT login FROM alts WHERE (primary = '" + nick + "' OR additional LIKE '%" + nick + "%')");
+						String pingedLogin = SqlConnector.getInstance().sendSelectQuery("SELECT login FROM alts WHERE (`primary` = '" + nick + "' OR `additional` LIKE '%" + nick + "%')");
 						if(pingedLogin.equals("") || pingedLogin == null){
 							//Unable to retrieve the login of the person who was pinged
 						}else{
