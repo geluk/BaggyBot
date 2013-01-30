@@ -33,6 +33,10 @@ public class StatsHandler {
 	public void processMessage(String channel, String sender, String login, String hostname, String message) {
 		incrementLineCount(login);
 		processAlts(login, sender);
+		String userNick = SqlConnector.getInstance().sendSelectQuery("SELECT nick FROM users WHERE nick = '" + sender + "'");
+		if(!userNick.equals("")){
+			SqlConnector.getInstance().sendQuery("UPDATE users SET nick = '" + login + "' WHERE nick = '" + sender + "'");
+		}
 		String[] words = message.split(" ");
 		if(words.length > 6){
 			if(Math.random() < 0.05){
