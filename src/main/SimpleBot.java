@@ -7,6 +7,11 @@ import java.util.Map;
 
 import org.jibble.pircbot.*;
 
+/*
+ * This is the main class for the bot.
+ * 
+ */
+
 public class SimpleBot extends PircBot{
 	
 	// Which prefix to use for commands
@@ -33,7 +38,7 @@ public class SimpleBot extends PircBot{
 	// When true, enables rems and the $g command
 	public boolean cadburyMode = false;
 	
-	// 
+	// Initializes some variables, shows login data and connects to the MySQL DB.
 	public SimpleBot(){
 		String name = SettingsManager.getInstance().getSetting("nick");
 		String login = SettingsManager.getInstance().getSetting("ident");
@@ -62,6 +67,7 @@ public class SimpleBot extends PircBot{
 		
 		instance = this;
 	}	
+	// Gets executed whenever an IRC message is sent
 	public void onMessage(String channel, String sender, String login, String hostname, String message){
 		if(message.startsWith(commandIdentifier) || (cadburyMode && message.startsWith("$"))){
 			ch.processCommand(channel, sender, login, hostname, message);
@@ -69,11 +75,15 @@ public class SimpleBot extends PircBot{
 			StatsHandler.getInstance().processMessage(channel, sender, login, hostname, message);
 		}
 	}
+	// Gets executed whenever somebody joins the channel
 	public void onJoin(String channel, String sender, String login, String hostname){
-		if(sender.equals("Cadbury")){
+		// Automatically disable cadbury mode if Cadbury joins the channel
+		if(login.equals("~Cadbury")){
 			cadburyMode = false;
 		}
 	}
+	// THROWS EXCEPTION EWW EWWW UGLY
+	// Intializes the bot by creating an instance of it, having it connect to an IRC server and join a channel.
 	public static void main(String args[]) throws Exception{
 		splash();
 		SimpleBot bot = new SimpleBot();
@@ -88,7 +98,8 @@ public class SimpleBot extends PircBot{
 		System.out.println("Ready to serve.");
 	}
 	
-	
+	// This was not cheaply copied from Cadbury's source or anything. Nope. Not at all.
+	// In my defense, my ASCII art sucks.
 	private static void splash() {
 		System.out.println("   ###   ##   ##   ## #   # ###   ##  #####");
 		System.out.println("   #  # #  # #    #    # #  #  # #  #   #");
@@ -118,9 +129,11 @@ public class SimpleBot extends PircBot{
 	public String getRem(String rem){
 		return rems.get(rem);
 	}
+	// This /should/ disconnect the bot cleanly.
 	public void shutdown(){
 		disconnect();
 		dispose();
+		SqlConnector.getInstance().disconnect();
 		System.exit(0);
 	}
 }

@@ -125,4 +125,12 @@ public class SqlConnector {
 	public void tryIncrement(String table, String primary, String primaryValue, String column, String insert) {
 		tryIncrement(table, primary, primaryValue, column, 1, insert);
 	}
+	public void disconnect() {
+		try {
+			dbConnection.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
 }
