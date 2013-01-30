@@ -9,7 +9,6 @@ import org.jibble.pircbot.*;
 
 /*
  * This is the main class for the bot.
- * 
  */
 
 public class SimpleBot extends PircBot{
@@ -17,7 +16,8 @@ public class SimpleBot extends PircBot{
 	// Which prefix to use for commands
 	private String commandIdentifier = "-";
 	
-	// The current version of the bot
+	// The current version of the bot. Only increment this each time there is a release.
+	// Convention: (milestone).(major)[.(minor).[(revision/bugfix)]]
 	public static final String version = "1.4";
 	
 	// More debug output?

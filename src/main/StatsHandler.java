@@ -5,6 +5,10 @@ import java.util.List;
 
 import org.jibble.pircbot.User;
 
+/*
+ * This class processes IRC messages and events to generate statistics.
+ */
+
 public class StatsHandler {
 	private static StatsHandler instance;
 	private List<String> profanities = Arrays.asList(new String[] { "fuck","cock", "dick", "cunt", "bitch", "shit", "piss", "nigger","asshole", "faggot", "wank" });
