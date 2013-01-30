@@ -35,7 +35,7 @@ public class StatsHandler {
 		processAlts(login, sender);
 		String[] words = message.split(" ");
 		if(words.length > 6){
-			if(/*Math.random() < 0.1*/ true){
+			if(Math.random() < 0.05){
 				setRandomQuote(login, message);
 			}
 		}
