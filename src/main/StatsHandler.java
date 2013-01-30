@@ -11,10 +11,11 @@ import org.jibble.pircbot.User;
 
 public class StatsHandler {
 	private static StatsHandler instance;
-	private List<String> profanities = Arrays.asList(new String[] { "fuck","cock", "dick", "cunt", "bitch", "shit", "piss", "nigger","asshole", "faggot", "wank" });
 	
-	private String[] emoticons = new String[] {":)", ":(", ":/", ":D", "D:", ":o", "o:", ":S", ":|", ":v", ":>", ":<", "^-^", "^_^", ">.>", "<.<", ">.<", ":3", ":P", ":p", "=)", "=D", "xD", "XD", ":$", "o.o", "c:", ":c", ":y", ">:c", ">:C", "C:", ":3"};
-
+	private List<String> profanities = Arrays.asList(new String[] { "fuck","cock", "dick", "cunt", "bitch", "shit", "piss", "nigger","asshole", "faggot", "wank" });
+	private String[] emoticons = { ":)", ":(", ":/", ":D", "D:", ":o", "o:", ":S", ":|", ":v", ":>", ":<", "^-^", "^_^", ">.>", "<.<", ">.<", ":3", ":P", ":p", "=)", "=D", "xD", "XD", ":$", "o.o", "c:", ":c", ":y", ">:c", ">:C", "C:", ":3" };
+	private String[] conjunctions = { "and", "but", "or", "yet", "for", "nor", "so" };
+	
 	public void addProfanity(String word) {
 		for (int i = 0; i < profanities.size(); i++) {
 			if (word.equals(profanities.get(i)))
@@ -45,7 +46,7 @@ public class StatsHandler {
 	}
 
 	private void setRandomQuote(String login, String message) {
-		SqlConnector.getInstance().sendQuery("UPDATE users SET random_quote = '" + message + "' WHERE nick = '" + login + "'");
+		SqlConnector.getInstance().sendQuery("UPDATE users SET random_quote = '" + message.replaceAll("'", "\\'") + "' WHERE nick = '" + login + "'");
 	}
 
 	private void processAlts(String login, String sender) {
@@ -107,18 +108,15 @@ public class StatsHandler {
 				continue;
 			}
 			if (word.equals("")) {
-				System.out.println("Dropping empty word.");
 				continue;
 			}
 			if (word.length() > 32 || word.length() < 3) {
 				continue;
 			}
 			if (isArticle(word)) {
-				System.out.println("Dropping article.");
 				continue;
 			}
 			if (isConjunction(word)) {
-				System.out.println("Dropping conjunction.");
 				continue;
 			}
 			if (isProfanity(word)) {
@@ -143,7 +141,6 @@ public class StatsHandler {
 	}
 
 	private boolean isConjunction(String word) {
-		String[] conjunctions = { "and", "but", "or", "yet", "for", "nor", "so" };
 		for (String conjunction : conjunctions) {
 			if (word.equals(conjunction))
 				return true;

@@ -73,6 +73,8 @@ public class CommandHandler {
 		    sb.append("max memory: " + format.format(maxMemory / 1024) + "<br/>");
 		    sb.append("total free memory: " + format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024) + "<br/>");
 		    System.out.println(sb.toString());
+		}else if(command.equals("citricpuns++") && (login.equals("~baggerboot") || login.equals("~citricsqu"))){
+			
 		}else{
 			processRem(channel, sender, login, hostname, command);
 		}
