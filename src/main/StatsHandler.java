@@ -33,10 +33,6 @@ public class StatsHandler {
 	public void processMessage(String channel, String sender, String login, String hostname, String message) {
 		incrementLineCount(login);
 		processAlts(login, sender);
-		String userNick = SqlConnector.getInstance().sendSelectQuery("SELECT nick FROM users WHERE nick = '" + sender + "'");
-		if(!userNick.equals("")){
-			SqlConnector.getInstance().sendQuery("UPDATE users SET nick = '" + login + "' WHERE nick = '" + sender + "'");
-		}
 		String[] words = message.split(" ");
 		if(words.length > 6){
 			if(Math.random() < 0.05){
@@ -61,7 +57,7 @@ public class StatsHandler {
 			String primaryNick = SqlConnector.getInstance().sendSelectQuery("SELECT `primary` FROM alts WHERE login = '" + login + "'");
 			if(!sender.equals(primaryNick)){
 				String altNicks = SqlConnector.getInstance().sendSelectQuery("SELECT `additional` FROM alts WHERE login = '" + login + "'");
-				if(!altNicks.contains(sender.toLowerCase())){
+				if(!altNicks.contains(sender.toLowerCase()) && !(login.equals("webchat") || login.equals("~Quassel"))){
 					SqlConnector.getInstance().sendQuery("UPDATE alts SET additional = CONCAT_WS(',', additional, '" + sender.toLowerCase() + "') WHERE login = '" + login + "'");
 				}
 			}
@@ -72,6 +68,7 @@ public class StatsHandler {
 		for(String word : words){
 			for(int i = 0; i < emoticons.length; i++){
 				String emoticon = emoticons[i];
+				if(word.startsWith("http://")) continue;
 				if(word.contains(emoticon)){
 					SqlConnector.getInstance().tryIncrementLastUsedBy("emoticons", "emoticon", emoticon, "frequency", login, "'"+ emoticon + "', 1, '" + login + "'");
 				}
