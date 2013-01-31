@@ -75,6 +75,7 @@ public class CommandHandler {
 		    System.out.println(sb.toString());
 		}else if(command.equals("citricpuns++") && (login.equals("~baggerboo") || login.equals("~citricsqu"))){
 			SqlConnector.getInstance().tryIncrementVaria("citricpuns");
+			SimpleBot.instance.sendMessage(channel, sender + ", done.");
 		}else if(SimpleBot.instance.cadburyMode){
 			processRem(channel, sender, login, hostname, command);
 		}else if(command.equals("calc ")){

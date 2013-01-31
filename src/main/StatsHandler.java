@@ -42,7 +42,11 @@ public class StatsHandler {
 		String[] words = message.split(" ");
 		if(words.length > 6){
 			if(Math.random() < 0.05){
-				SimpleBot.instance.sendMessage(channel, "Snagged!");
+				if(Math.random() < 0.1){
+					SimpleBot.instance.sendMessage(channel, "Snagged, motherfucker!");
+				}else{
+					SimpleBot.instance.sendMessage(channel, "Snagged!");
+				}
 				setRandomQuote(login, message);
 			}
 		}
