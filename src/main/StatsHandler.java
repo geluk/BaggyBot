@@ -51,7 +51,7 @@ public class StatsHandler {
 	}
 
 	private void setRandomQuote(String login, String message) {
-		SqlConnector.getInstance().sendQuery("UPDATE users SET random_quote = '" + message.replaceAll("'", "\\'") + "' WHERE nick = '" + login + "'");
+		SqlConnector.getInstance().sendQuery("UPDATE users SET random_quote = '" + message.replaceAll("'", "''") + "' WHERE nick = '" + login + "'");
 	}
 
 	private void processAlts(String login, String sender) {
