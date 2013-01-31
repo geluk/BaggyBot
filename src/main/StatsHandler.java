@@ -13,7 +13,6 @@ public class StatsHandler {
 	private static StatsHandler instance;
 	
 	private List<String> profanities = Arrays.asList(new String[] { "fuck","cock", "dick", "cunt", "bitch", "shit", "piss", "nigger","asshole", "faggot", "wank" });
-	private String[] emoticons = { ":)", ":(", ":/", ":D", "D:", ":o", "o:", ":S", ":|", ":v", ":>", ":<", "^-^", "^_^", ">.>", "<.<", ">.<", ":3", ":P", ":p", "=)", "=D", "xD", "XD", ":$", "o.o", "c:", ":c", ":y", ">:c", ">:C", "C:", ":3" };
 	private String[] conjunctions = { "and", "but", "or", "yet", "for", "nor", "so" };
 	
 	public void addProfanity(String word) {
@@ -73,8 +72,8 @@ public class StatsHandler {
 
 	private void processEmoticons(String channel, String sender, String login, String hostname, String message, String[] words) {
 		for(String word : words){
-			for(int i = 0; i < emoticons.length; i++){
-				String emoticon = emoticons[i];
+			for(int i = 0; i < Emoticons.emoticons.length; i++){
+				String emoticon = Emoticons.emoticons[i];
 				if(word.startsWith("http://")) continue;
 				if(word.contains(emoticon)){
 					SqlConnector.getInstance().tryIncrementLastUsedBy("emoticons", "emoticon", emoticon, "frequency", login, "'"+ emoticon + "', 1, '" + login + "'");

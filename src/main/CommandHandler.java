@@ -43,7 +43,7 @@ public class CommandHandler {
 			SimpleBot.instance.shutdown();
 		}else if(command.startsWith("query ")){
 			processSqlCommand(channel, sender, login, hostname, command);
-		}else if(command.startsWith("info")){
+		}else if(command.startsWith("info") || command.startsWith("help") || command.startsWith("version")){
 			SimpleBot.instance.sendMessage(channel, "StatsBot " + SimpleBot.version +" - made by baggerboot. Stats page: http://jgeluk.net/stats/");
 		}else if(command.equals("tcm") && authorize(channel, login, hostname)){
 			SimpleBot.instance.cadburyMode = !SimpleBot.instance.cadburyMode;
