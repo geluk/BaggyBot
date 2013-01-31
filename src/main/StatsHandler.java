@@ -12,16 +12,8 @@ import org.jibble.pircbot.User;
 public class StatsHandler {
 	private static StatsHandler instance;
 	
-	private List<String> profanities = Arrays.asList(new String[] { "fuck","cock", "dick", "cunt", "bitch", "shit", "piss", "nigger","asshole", "faggot", "wank" });
+	private String[] profanities =  { "fuck","cock", "dick", "cunt", "bitch", "shit", "piss", "nigger", "asshole", "faggot", "wank" };
 	private String[] conjunctions = { "and", "but", "or", "yet", "for", "nor", "so" };
-	
-	public void addProfanity(String word) {
-		for (int i = 0; i < profanities.size(); i++) {
-			if (word.equals(profanities.get(i)))
-				return;
-		}
-		profanities.add(word);
-	}
 
 	public static StatsHandler getInstance() {
 		if (instance == null) {
@@ -86,6 +78,7 @@ public class StatsHandler {
 				String emoticon = Emoticons.emoticons[i];
 				if(word.startsWith("http://")) continue;
 				if(word.equals(emoticon)){
+					System.out.println("Processing emoticon for " + word + " as " + emoticon);
 					SqlConnector.getInstance().tryIncrementLastUsedBy("emoticons", "emoticon", emoticon, "frequency", login, "'"+ emoticon + "', 1, '" + login + "'");
 				}
 			}
@@ -142,8 +135,8 @@ public class StatsHandler {
 	}
 
 	private boolean isProfanity(String word) {
-		for (int i = 0; i < profanities.size(); i++) {
-			String profanity = profanities.get(i);
+		for (int i = 0; i < profanities.length; i++) {
+			String profanity = profanities[i];
 			if (word.contains(profanity)) {
 				return true;
 			}

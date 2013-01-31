@@ -17,7 +17,7 @@ public class CommandHandler {
 	}
 	public void processCommand(String channel, String sender, String login, String hostname, String message){
 		String command = message.substring(1);
-		//String[] params = command.split(" ");
+		String[] params = command.split(" ");
 		System.out.println("COMMAND: " + command);
 		if(SimpleBot.instance.cadburyMode){
 			if(command.startsWith("rem ")){
@@ -52,6 +52,13 @@ public class CommandHandler {
 			}else{
 				SimpleBot.instance.sendMessage(channel, "'$g' and rems disabled.");
 			}
+		}else if(command.startsWith("set ")){
+			if(params.length == 5 && params[1].equals("primary") && params[3].equals("for")){
+				String _login = params[4];
+				String newPrimary = params[2];
+				String result = SqlConnector.getInstance().sendQuery("UPDATE alts SET `primary` = '" + newPrimary + "' WHERE `login` = '" + _login + "'");
+				SimpleBot.instance.sendMessage(channel, sender + ", " + result);
+			}
 		}else if(command.startsWith("del ") && authorize(channel, login, hostname)){
 			if(command.substring("del ".length()).startsWith("word")){
 				String word = command.substring("del word ".length());
@@ -79,6 +86,7 @@ public class CommandHandler {
 		}else if(SimpleBot.instance.cadburyMode){
 			processRem(channel, sender, login, hostname, command);
 		}else if(command.equals("calc ")){
+			String formattedStatement = command.substring("calc ".length()).replaceAll(" ", "");
 			
 		}else if(command.equals("ping")){
 			SimpleBot.instance.sendMessage(channel, "Pong!");
