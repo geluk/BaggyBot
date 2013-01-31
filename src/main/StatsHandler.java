@@ -75,11 +75,12 @@ public class StatsHandler {
 	}
 
 	private void processEmoticons(String channel, String sender, String login, String hostname, String message, String[] words) {
+		if(login.equals("~Cadbury")) return;
 		for(String word : words){
 			for(int i = 0; i < Emoticons.emoticons.length; i++){
 				String emoticon = Emoticons.emoticons[i];
 				if(word.startsWith("http://")) continue;
-				if(word.contains(emoticon)){
+				if(word.equals(emoticon)){
 					SqlConnector.getInstance().tryIncrementLastUsedBy("emoticons", "emoticon", emoticon, "frequency", login, "'"+ emoticon + "', 1, '" + login + "'");
 				}
 			}
