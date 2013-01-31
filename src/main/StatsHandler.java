@@ -33,13 +33,14 @@ public class StatsHandler {
 	public void processMessage(String channel, String sender, String login, String hostname, String message) {
 		incrementLineCount(login);
 		SqlConnector.getInstance().tryIncrementVaria("global_line_count");
-		if(message.endsWith("!")){
-			SqlConnector.getInstance().tryIncrement("users", "nick", login, "exclamations", "'" + login + "', 0, 0, 0, 1, 0, 0, 0, 0, 0, ''");
-		}else if(message.endsWith("?")){
-			SqlConnector.getInstance().tryIncrement("users", "nick", login, "questions", "'" + login + "', 0, 0, 1, 0, 0, 0, 0, 0, 0, ''");
-		}
+		processQE(login, message);
 		processAlts(login, sender);
 		String[] words = message.split(" ");
+		processRandomQuote(channel, login, message, words);
+		processEmoticons(channel, sender, login, hostname, message, words);
+		processWords(channel, sender, login, hostname, message, words);
+	}
+	private void processRandomQuote(String channel, String login, String message, String[] words){
 		if(words.length > 6){
 			if(Math.random() < 0.05){
 				if(Math.random() < 0.1){
@@ -50,10 +51,14 @@ public class StatsHandler {
 				setRandomQuote(login, message);
 			}
 		}
-		processEmoticons(channel, sender, login, hostname, message, words);
-		processWords(channel, sender, login, hostname, message, words);
 	}
-
+	private void processQE(String login, String message){
+		if(message.endsWith("!")){
+			SqlConnector.getInstance().tryIncrement("users", "nick", login, "exclamations", "'" + login + "', 0, 0, 0, 1, 0, 0, 0, 0, 0, ''");
+		}else if(message.endsWith("?")){
+			SqlConnector.getInstance().tryIncrement("users", "nick", login, "questions", "'" + login + "', 0, 0, 1, 0, 0, 0, 0, 0, 0, ''");
+		}
+	}
 	private void setRandomQuote(String login, String message) {
 		SqlConnector.getInstance().sendQuery("UPDATE users SET random_quote = '" + message.replaceAll("'", "''") + "' WHERE nick = '" + login + "'");
 	}

@@ -80,6 +80,8 @@ public class CommandHandler {
 			processRem(channel, sender, login, hostname, command);
 		}else if(command.equals("calc ")){
 			
+		}else if(command.equals("ping")){
+			SimpleBot.instance.sendMessage(channel, "Pong!");
 		}else{
 			System.out.println("Ignoring invalid command.");
 		}
