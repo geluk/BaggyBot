@@ -18,7 +18,7 @@ public class SimpleBot extends PircBot{
 	
 	// The current version of the bot. Only increment this each time there is a release.
 	// Convention: (milestone).(major)[.(minor).[(revision/bugfix)]]
-	public static final String version = "1.5.4.1";
+	public static final String version = "1.5.5";
 	
 	// More debug output?
 	private static final boolean verbose = false;
