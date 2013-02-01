@@ -14,6 +14,7 @@ public class StatsHandler {
 	
 	private String[] profanities =  { "fuck","cock", "dick", "cunt", "bitch", "shit", "piss", "nigger", "asshole", "faggot", "wank" };
 	private String[] conjunctions = { "and", "but", "or", "yet", "for", "nor", "so" };
+	private String[] snagMessages = { "Snagged the shit outta that one!", "What a lame quote. Snagged!", "Imma stash those words for you.", "Snagged, motherfucker!", "Everything looks great out of context. Snagged!", "Yoink!"};
 
 	public static StatsHandler getInstance() {
 		if (instance == null) {
@@ -35,10 +36,15 @@ public class StatsHandler {
 	private void processRandomQuote(String channel, String login, String message, String[] words){
 		if(words.length > 6){
 			if(Math.random() < 0.05){
-				if(Math.random() < 0.1){
-					SimpleBot.instance.sendMessage(channel, "Snagged, motherfucker!");
-				}else{
-					SimpleBot.instance.sendMessage(channel, "Snagged!");
+				double rand = Math.random();
+				for(int i = 0; i <= snagMessages.length; i++){
+					if( rand < 1 / (snagMessages.length*2.5f) && i < snagMessages.length){
+						SimpleBot.instance.sendMessage(channel, snagMessages[i]);
+						break;
+					}
+					else if(i == snagMessages.length){
+						SimpleBot.instance.sendMessage(channel, "Snagged!");
+					}
 				}
 				setRandomQuote(login, message);
 			}
