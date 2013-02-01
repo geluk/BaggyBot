@@ -1,8 +1,5 @@
 package main;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.jibble.pircbot.User;
 
 /*
@@ -38,7 +35,7 @@ public class StatsHandler {
 			if(Math.random() < 0.05){
 				double rand = Math.random();
 				for(int i = 0; i <= snagMessages.length; i++){
-					if( rand < 1 / (snagMessages.length*2.5f) && i < snagMessages.length){
+					if( rand < (1 / (snagMessages.length*2.5f)*i+1.0) && i < snagMessages.length){
 						SimpleBot.instance.sendMessage(channel, snagMessages[i]);
 						break;
 					}
@@ -84,7 +81,6 @@ public class StatsHandler {
 				String emoticon = Emoticons.emoticons[i];
 				if(word.startsWith("http://")) continue;
 				if(word.equals(emoticon)){
-					System.out.println("Processing emoticon for " + word + " as " + emoticon);
 					SqlConnector.getInstance().tryIncrementLastUsedBy("emoticons", "emoticon", emoticon, "frequency", login, "'"+ emoticon + "', 1, '" + login + "'");
 				}
 			}
