@@ -11,7 +11,7 @@ public class StatsHandler {
 	
 	private String[] profanities =  { "fuck","cock", "dick", "cunt", "bitch", "shit", "piss", "nigger", "asshole", "faggot", "wank" };
 	private String[] conjunctions = { "and", "but", "or", "yet", "for", "nor", "so" };
-	private String[] snagMessages = { "Snagged the shit outta that one!", "What a lame quote. Snagged!", "Imma stash those words for you.", "Snagged, motherfucker!", "Everything looks great out of context. Snagged!", "Yoink!"};
+	private String[] snagMessages = { "Snagged the shit outta that one!", "What a lame quote. Snagged!", "Imma stash those words for you.", "Snagged, motherfucker!", "Everything looks great out of context. Snagged!", "Yoink!", ""};
 
 	public static StatsHandler getInstance() {
 		if (instance == null) {
@@ -30,12 +30,16 @@ public class StatsHandler {
 		processEmoticons(channel, sender, login, hostname, message, words);
 		processWords(channel, sender, login, hostname, message, words);
 	}
+	private void sendMessage(String target, String message){
+		SimpleBot.instance.sendMessage(target, message);
+	}
 	private void processRandomQuote(String channel, String login, String message, String[] words){
 		if(words.length > 6){
-			if(Math.random() < 0.05){
+			if(Math.random() < 1){
 				double rand = Math.random();
 				for(int i = 0; i <= snagMessages.length; i++){
-					if( rand < (1 / (snagMessages.length*2.5f)*i+1.0) && i < snagMessages.length){
+					double treshold = (1.0 / ((double) snagMessages.length*2.5)*((double)i+1.0));
+					if( rand < treshold && i < snagMessages.length){
 						SimpleBot.instance.sendMessage(channel, snagMessages[i]);
 						break;
 					}
@@ -114,7 +118,6 @@ public class StatsHandler {
 				word = word.replaceAll("[^A-Za-z0-9]", "");
 			} else {
 				// Add support for URLs here later
-				System.out.println("Dropping URL.");
 				continue;
 			}
 			if (word.equals("")) {

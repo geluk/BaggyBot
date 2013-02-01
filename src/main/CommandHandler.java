@@ -154,7 +154,6 @@ public class CommandHandler {
 
 	private void addRem(String channel, String sender, String command) {
 		String[] args = command.split(" ");
-		System.out.println("args size" + args.length);
 		if(SimpleBot.instance.remExists(args[1])){
 			SimpleBot.instance.sendMessage(channel, "I already have something saved for " + args[1]);
 		}else{
@@ -163,7 +162,6 @@ public class CommandHandler {
 		}
 	}
 	private void processRem(String channel, String sender, String login, String hostname, String command){
-		System.out.println("Processing rem for " + command);
 		if(SimpleBot.instance.remExists(command)){
 			String definition = SimpleBot.instance.getRem(command);
 			SimpleBot.instance.sendMessage(channel, definition);
