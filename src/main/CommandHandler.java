@@ -7,14 +7,15 @@ import java.net.URLEncoder;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import com.google.gson.Gson;
 
 public class CommandHandler {
 	
-	public CommandHandler(){
-		
-	}
+	private String[] shutdownMessages = {"He- oh.. Goodbye world ;~;", "Nobody loves me D:", "Hey, I didn't hurt you!", "It's okay.", "AAAAAAHHHHHHH!!!!", "I don't blame you..", "No hard feelings.", "Shutting down.", "Nap time.", "Nononono I can fix this I ca-", "NNNNNOOOOOOOOOOOOOOOOOOOO~"};
+	
+	
 	public void processCommand(String channel, String sender, String login, String hostname, String message){
 		String command = message.substring(1);
 		String[] params = command.split(" ");
@@ -38,8 +39,13 @@ public class CommandHandler {
 			}else{
 				SimpleBot.instance.sendMessage(channel, "No unread exceptions left.");
 			}
-		}else if(command.startsWith("shutdown") && authorize(channel, login, hostname)){
-			SimpleBot.instance.disconnect();
+		}else if(command.equals("shutdown") && authorize(channel, login, hostname)){
+			SimpleBot.instance.sendMessage(channel, shutdownMessages[new Random().nextInt(shutdownMessages.length)]);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			SimpleBot.instance.shutdown();
 		}else if(command.startsWith("query ")){
 			processSqlCommand(channel, sender, login, hostname, command);

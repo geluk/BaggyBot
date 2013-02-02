@@ -35,7 +35,7 @@ public class StatsHandler {
 	}
 	private void processRandomQuote(String channel, String login, String message, String[] words){
 		if(words.length > 6){
-			if(Math.random() < 1){
+			if(Math.random() < 0.05){
 				double rand = Math.random();
 				for(int i = 0; i <= snagMessages.length; i++){
 					double treshold = (1.0 / ((double) snagMessages.length*2.5)*((double)i+1.0));

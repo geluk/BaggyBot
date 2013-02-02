@@ -18,7 +18,7 @@ public class SimpleBot extends PircBot{
 	
 	// The current version of the bot. Only increment this each time there is a release.
 	// Convention: (milestone).(major)[.(minor).[(revision/bugfix)]]
-	public static final String version = "1.5.5.1";
+	public static final String version = "1.6";
 	
 	// More debug output?
 	private static final boolean verbose = false;
@@ -150,7 +150,7 @@ public class SimpleBot extends PircBot{
 	}
 	// This /should/ disconnect the bot cleanly.
 	public void shutdown(){
-		disconnect();
+		quitServer();
 		dispose();
 		SqlConnector.getInstance().disconnect();
 		System.exit(0);

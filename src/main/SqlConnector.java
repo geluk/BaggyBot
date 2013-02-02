@@ -129,11 +129,12 @@ public class SqlConnector {
 	
 	public void tryIncrement(String table, String primary, String primaryValue, String column, int amount, String insert) {
 		boolean created;
-		String result = sendSelectQuery("SELECT COUNT(*) " + primary + " FROM " + table + " WHERE "+ primary + " = '" + primaryValue + "'");
+		String query = "SELECT COUNT(`" + primary + "`) FROM `" + table + "` WHERE `"+ primary + "` = '" + primaryValue + "'";
+		String result = sendSelectQuery(query);
 		created = (Integer.parseInt(result) > 0);
 
 		if (created) {
-			sendQuery("UPDATE " + table + " SET `" + column + "` = `" + column+ "` + " + amount + " WHERE " + primary + " = '"+ primaryValue + "'");
+			sendQuery("UPDATE " + table + " SET `" + column + "` = `" + column+ "` + " + amount + " WHERE `" + primary + "` = '"+ primaryValue + "'");
 		} else {
 			sendQuery("INSERT INTO " + table + " VALUES (" + insert + ")");
 		}
@@ -146,7 +147,7 @@ public class SqlConnector {
 
 	}
 	public void tryIncrementVaria(String key){
-		tryIncrement("varia", "`key`", key, "value", "'" + key + "', 1");
+		tryIncrement("varia", "key", key, "value", "'" + key + "', 1");
 	}
 
 	// Increments a value in a column behind the primary key with value
