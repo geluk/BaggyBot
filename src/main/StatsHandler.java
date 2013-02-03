@@ -12,7 +12,9 @@ public class StatsHandler {
 	private String[] profanities =  { "fuck","cock", "dick", "cunt", "bitch", "shit", "piss", "nigger", "asshole", "faggot", "wank" };
 	private String[] conjunctions = { "and", "but", "or", "yet", "for", "nor", "so" };
 	private String[] snagMessages = { "Snagged the shit outta that one!", "What a lame quote. Snagged!", "Imma stash those words for you.", "Snagged, motherfucker!", "Everything looks great out of context. Snagged!", "Yoink!", ""};
-
+	private String[] ignoredWords = { "that", "this", "what", "thats", "they", "then", "there", "when", "with", "well", "from", "will", "here" };
+	
+	
 	public static StatsHandler getInstance() {
 		if (instance == null) {
 			instance = new StatsHandler();
@@ -109,6 +111,7 @@ public class StatsHandler {
 							//Unable to retrieve the login of the person who was pinged
 						}else{
 							SqlConnector.getInstance().tryIncrement("users", "nick", pingedLogin, "pings", "'" + nick + "', 1, 0, 0, 0, 0, 0, 0, 0, ''");
+							continue;
 						}
 						
 					}
@@ -121,6 +124,9 @@ public class StatsHandler {
 				continue;
 			}
 			if (word.equals("")) {
+				continue;
+			}
+			if (isIgnoredWord(word)){
 				continue;
 			}
 			if (word.length() > 32 || word.length() < 3) {
@@ -152,6 +158,13 @@ public class StatsHandler {
 	private void incrementLineCount(String nick) {
 		SqlConnector.getInstance().tryIncrement("users", "nick", nick, "lines", "'" + nick + "', 0, 0, 0, 0, 0, 0, 0, 1, 0, ''");
 	}
+	private boolean isIgnoredWord(String word) {
+		for (String ignoreWord : ignoredWords) {
+			if (word.equals(ignoreWord))
+				return true;
+		}
+		return false;
+	}
 
 	private boolean isConjunction(String word) {
 		for (String conjunction : conjunctions) {
@@ -168,5 +181,9 @@ public class StatsHandler {
 	public void processAction(String sender, String login, String hostname, String target, String action) {
 		SqlConnector.getInstance().tryIncrementVaria("global_action_count");
 		SqlConnector.getInstance().tryIncrement("users", "nick", login, "actions", "'" + login + "', 0, 1, 0, 0, 0, 0, 0, 0, 0, ''");
+		
+		if(sender.toLowerCase().startsWith("theevilp") && action.toLowerCase().startsWith("eats")){
+			SqlConnector.getInstance().tryIncrementVaria("evil_people_eaten");
+		}
 	}
 }

@@ -13,8 +13,8 @@ import com.google.gson.Gson;
 
 public class CommandHandler {
 	
-	private String[] shutdownMessages = {"He- oh.. Goodbye world ;~;", "Nobody loves me D:", "Hey, I didn't hurt you!", "It's okay.", "AAAAAAHHHHHHH!!!!", "I don't blame you..", "No hard feelings.", "Shutting down.", "Nap time.", "Nononono I can fix this I ca-", "NNNNNOOOOOOOOOOOOOOOOOOOO~"};
-	
+	private String[] shutdownMessages = {"He- oh.. Goodbye world ;~;", "Nobody loves me D:", "Hey, I didn't hurt you!", "It's okay.", "AAAAAAHHHHHHH!!!!", "I don't blame you...", "No hard feelings.", "Shutting down.", "Nap time.", "Nononono I can fix this I ca-", "NNNNNOOOOOOOOOOOOOOOOOOOO~"};
+	private boolean gfy = false;
 	
 	public void processCommand(String channel, String sender, String login, String hostname, String message){
 		String command = message.substring(1);
@@ -39,6 +39,7 @@ public class CommandHandler {
 			}else{
 				SimpleBot.instance.sendMessage(channel, "No unread exceptions left.");
 			}
+		
 		}else if(command.equals("shutdown") && authorize(channel, login, hostname)){
 			SimpleBot.instance.sendMessage(channel, shutdownMessages[new Random().nextInt(shutdownMessages.length)]);
 			try {
@@ -47,10 +48,24 @@ public class CommandHandler {
 				e.printStackTrace();
 			}
 			SimpleBot.instance.shutdown();
+		
 		}else if(command.startsWith("query ")){
 			processSqlCommand(channel, sender, login, hostname, command);
+			
+		
+		}else if(command.startsWith("help ")){
+			if(params[1].equals("quote")){
+				sendMessage(channel, sender + ", For each line sent to the channel, if it contains more than 6 words, it has a 5% chance of becoming that user's random quote.");
+			}else if(params[1].equals("topics")){
+				sendMessage(channel, sender + ", Use -help <topic> to get help about a specific topic. Available topics are: login, quote");
+			}else if(params[1].equals("login")){
+				sendMessage(channel, sender + ", Currently, people are identified by their login. This means that statistics are shared if you use webchat or if you haven't set up your login. Refer to your IRC client's documentation to find out how to set it up.");
+			}
+		
 		}else if(command.startsWith("info") || command.startsWith("help") || command.startsWith("version")){
-			SimpleBot.instance.sendMessage(channel, "StatsBot " + SimpleBot.version +" - made by baggerboot. Stats page: http://jgeluk.net/stats/");
+			SimpleBot.instance.sendMessage(channel, "StatsBot " + SimpleBot.version +" - made by baggerboot. Stats page: http://jgeluk.net/stats/ - For various help topics, use the '-help topics' command.");
+		
+		
 		}else if(command.equals("tcm") && authorize(channel, login, hostname)){
 			SimpleBot.instance.cadburyMode = !SimpleBot.instance.cadburyMode;
 			if(SimpleBot.instance.cadburyMode){
@@ -58,6 +73,7 @@ public class CommandHandler {
 			}else{
 				SimpleBot.instance.sendMessage(channel, "'$g' and rems disabled.");
 			}
+		
 		}else if(command.startsWith("set ")){
 			if(params.length == 5 && params[1].equals("primary") && params[3].equals("for")){
 				String _login = params[4];
@@ -65,12 +81,25 @@ public class CommandHandler {
 				String result = SqlConnector.getInstance().sendQuery("UPDATE alts SET `primary` = '" + newPrimary + "' WHERE `login` = '" + _login + "'");
 				SimpleBot.instance.sendMessage(channel, sender + ", " + result);
 			}
+			
+		}else if(command.startsWith("get ") && authorize(channel, login, hostname)){
+			if(params.length == 2){
+				if(params[1].equals("mcapreached")){
+					if(gfy){
+						sendMessage(channel, sender + ", true.");
+					}else{
+						sendMessage(channel, sender + ", false.");
+					}
+				}
+			}
+			
 		}else if(command.startsWith("del ") && authorize(channel, login, hostname)){
 			if(command.substring("del ".length()).startsWith("word")){
 				String word = command.substring("del word ".length());
 				SqlConnector.getInstance().sendQuery("DELETE FROM words WHERE word = '" + word + "'");
 				SimpleBot.instance.sendMessage(channel, sender + ", I have removed " + word + " from the words list.");
 			}
+			
 		}else if(command.startsWith("mem")){
 			Runtime runtime = Runtime.getRuntime();
 
@@ -86,19 +115,33 @@ public class CommandHandler {
 		    sb.append("max memory: " + format.format(maxMemory / 1024) + "<br/>");
 		    sb.append("total free memory: " + format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024) + "<br/>");
 		    System.out.println(sb.toString());
+		
+		
 		}else if(command.equals("citricpuns++") && (login.equals("~baggerboo") || login.equals("~citricsqu"))){
 			SqlConnector.getInstance().tryIncrementVaria("citricpuns");
 			SimpleBot.instance.sendMessage(channel, sender + ", done.");
+		
+		
 		}else if(SimpleBot.instance.cadburyMode){
 			processRem(channel, sender, login, hostname, command);
+		
+		
 		}else if(command.equals("calc ")){
 			String formattedStatement = command.substring("calc ".length()).replaceAll(" ", "");
 			
+		
+		
 		}else if(command.equals("ping")){
 			SimpleBot.instance.sendMessage(channel, "Pong!");
+		
+		
 		}else{
 			System.out.println("Ignoring invalid command.");
 		}
+	}
+	private void sendMessage(String channel, String message) {
+		SimpleBot.instance.sendMessage(channel, message);
+		
 	}
 	private boolean authorize(String channel, String login, String hostname){
 		if(login.equals("~baggerboo") && hostname.equals("199.115.228.30")){
@@ -118,7 +161,11 @@ public class CommandHandler {
 		List<String> lines = new ArrayList<String>();
 		
 		if(command.toLowerCase().startsWith("select")){
-			
+			if(command.toLowerCase().startsWith("go fuck yourself") || command.startsWith("fuck yourself")){
+				sendMessage(channel, "No, how about you go fuck yourself. That seems like a better plan.");
+				gfy = true;
+				return;
+			}
 			try {
 				String[] results = SqlConnector.getInstance().sendSelectQueryArr(command);
 				for(int i = 0; i < results.length; i++){

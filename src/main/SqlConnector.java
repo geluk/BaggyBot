@@ -108,6 +108,7 @@ public class SqlConnector {
 			statement = dbConnection.prepareStatement(query);
 			statement.execute();
 		} catch (SQLException e) {
+			System.out.println("Failed: " + query);
 			registerException(e);
 			e.printStackTrace();
 			status = "Failed";
