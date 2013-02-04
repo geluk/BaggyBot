@@ -11,8 +11,8 @@ public class StatsHandler {
 	
 	private String[] profanities =  { "fuck","cock", "dick", "cunt", "bitch", "shit", "piss", "nigger", "asshole", "faggot", "wank" };
 	private String[] conjunctions = { "and", "but", "or", "yet", "for", "nor", "so" };
-	private String[] snagMessages = { "Snagged the shit outta that one!", "What a lame quote. Snagged!", "Imma stash those words for you.", "Snagged, motherfucker!", "Everything looks great out of context. Snagged!", "Yoink!", ""};
-	private String[] ignoredWords = { "that", "this", "what", "thats", "they", "then", "there", "when", "with", "well", "from", "will", "here" };
+	private String[] snagMessages = { "Snagged the shit outta that one!", "What a lame quote. Snagged!", "Imma stash those words for you.", "Snagged, motherfucker!", "Everything looks great out of context. Snagged!", "Yoink!", "That'll look nice on the stats page."};
+	private String[] ignoredWords = { "you", "its", "not", "was", "are", "can", "now", "all", "how", "that", "this", "what", "thats", "they", "then", "there", "when", "with", "well", "from", "will", "here" };
 	
 	
 	public static StatsHandler getInstance() {
@@ -23,6 +23,7 @@ public class StatsHandler {
 	}
 
 	public void processMessage(String channel, String sender, String login, String hostname, String message) {
+		processReply(channel, sender, message);
 		incrementLineCount(login);
 		SqlConnector.getInstance().tryIncrementVaria("global_line_count");
 		processQE(login, message);
@@ -32,12 +33,23 @@ public class StatsHandler {
 		processEmoticons(channel, sender, login, hostname, message, words);
 		processWords(channel, sender, login, hostname, message, words);
 	}
+	private void processReply(String channel, String sender, String message) {
+		if(message.toLowerCase().contains("i hate you baggybot") || message.toLowerCase().contains("baggybot i hate you") || message.toLowerCase().contains("baggybot, i hate you")){
+			sendMessage(channel, sender + ", I live for these moments.");
+		}
+		else if(message.toLowerCase().contains("fuck you baggybot") || message.toLowerCase().contains("fuck off baggerboot")){
+			sendMessage(channel, sender + ", I love you too <3");
+		}
+	}
+
 	private void sendMessage(String target, String message){
 		SimpleBot.instance.sendMessage(target, message);
 	}
 	private void processRandomQuote(String channel, String login, String message, String[] words){
+		String result = SqlConnector.getInstance().sendSelectQuery("SELECT random_quote FROM users WHERE nick = '" + login + "'");
+		double chance = (result == null || result.equals("")) ? 0.075 : 0.03;
 		if(words.length > 6){
-			if(Math.random() < 0.05){
+			if(Math.random() < chance){
 				double rand = Math.random();
 				for(int i = 0; i <= snagMessages.length; i++){
 					double treshold = (1.0 / ((double) snagMessages.length*2.5)*((double)i+1.0));
@@ -110,7 +122,7 @@ public class StatsHandler {
 						if(pingedLogin.equals("") || pingedLogin == null){
 							//Unable to retrieve the login of the person who was pinged
 						}else{
-							SqlConnector.getInstance().tryIncrement("users", "nick", pingedLogin, "pings", "'" + nick + "', 1, 0, 0, 0, 0, 0, 0, 0, ''");
+							SqlConnector.getInstance().tryIncrement("users", "nick", pingedLogin, "pings", "'" + nick + "', 1, 0, 0, 0, 0, 0, 0, 0, 0, ''");
 							continue;
 						}
 						

@@ -134,7 +134,10 @@ public class CommandHandler {
 		}else if(command.equals("ping")){
 			SimpleBot.instance.sendMessage(channel, "Pong!");
 		
-		
+		}else if(command.equals("queery")){
+			
+			sendMessage(channel, "Dohohohoho~");
+			
 		}else{
 			System.out.println("Ignoring invalid command.");
 		}
@@ -154,7 +157,11 @@ public class CommandHandler {
 	
 	private void processSqlCommand(String channel, String sender, String login, String hostname, String command) {
 		if(!(login.equals("~baggerboo") && hostname.equals("199.115.228.30"))){
-			SimpleBot.instance.sendMessage(channel, sender + ": Only my master may do that ;~;");
+			if(command.contains("dick") || command.contains("fuck")){
+				sendMessage(channel, sender + ", how about you go " + command.substring(6));
+			}else{
+				sendMessage(channel, sender + ": Only my master may do that ;~;");
+			}
 			return;
 		}
 		command = command.substring(6);
