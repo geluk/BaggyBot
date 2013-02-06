@@ -33,7 +33,7 @@ public class SqlConnector {
 		} catch (SQLException e) {
 			System.out.println("Unable to establish a connection to the SQL server:");
 			e.printStackTrace();
-			SimpleBot.instance.unreadExceptions.add(e.getMessage());
+			BaggyBot.instance.unreadExceptions.add(e.getMessage());
 			return;
 		}
 		hasConnected = true;
@@ -68,7 +68,7 @@ public class SqlConnector {
 	}
 	// Adds an exception to the list of unread exceptions.
 	private void registerException(Exception e){
-		SimpleBot.instance.unreadExceptions.add(e.getMessage());
+		BaggyBot.instance.unreadExceptions.add(e.getMessage());
 	}
 	// Returns a string array containing all results. Only use this when your SQL query will return one column.
 	public String[] sendSelectQueryArr(String query){

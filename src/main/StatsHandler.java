@@ -39,11 +39,17 @@ public class StatsHandler {
 		}
 		else if(message.toLowerCase().contains("fuck you baggybot") || message.toLowerCase().contains("fuck off baggerboot")){
 			sendMessage(channel, sender + ", I love you too <3");
+//			<_Rogue_> also don't double click it next time :p
+//			<BaggyBot> Snagged!
+//			<_Rogue_> fuck you BaggyBot
+//			<BaggyBot> _Rogue_, I love you too <3
+//			<_Rogue_> kjvfhdsjklfmdsabjldflkdsmnsdkfs
+//			<_Rogue_> BAGGERBOOT YOU ASS
 		}
 	}
 
 	private void sendMessage(String target, String message){
-		SimpleBot.instance.sendMessage(target, message);
+		BaggyBot.instance.sendMessage(target, message);
 	}
 	private void processRandomQuote(String channel, String login, String message, String[] words){
 		String result = SqlConnector.getInstance().sendSelectQuery("SELECT random_quote FROM users WHERE nick = '" + login + "'");
@@ -54,11 +60,11 @@ public class StatsHandler {
 				for(int i = 0; i <= snagMessages.length; i++){
 					double treshold = (1.0 / ((double) snagMessages.length*2.5)*((double)i+1.0));
 					if( rand < treshold && i < snagMessages.length){
-						SimpleBot.instance.sendMessage(channel, snagMessages[i]);
+						BaggyBot.instance.sendMessage(channel, snagMessages[i]);
 						break;
 					}
 					else if(i == snagMessages.length){
-						SimpleBot.instance.sendMessage(channel, "Snagged!");
+						BaggyBot.instance.sendMessage(channel, "Snagged!");
 					}
 				}
 				setRandomQuote(login, message);
@@ -106,7 +112,7 @@ public class StatsHandler {
 	}
 
 	private void processWords(String channel, String sender, String login, String hostname, String message, String[] words) {
-		User[] users = SimpleBot.instance.getUsers(channel);
+		User[] users = BaggyBot.instance.getUsers(channel);
 		
 		SqlConnector.getInstance().tryIncrement("users", "nick", login, "words", words.length, "'"+ sender + "', 0, 0, 0, 0, 0, 0, 0, 0, " + words.length + ", ''");
 		
