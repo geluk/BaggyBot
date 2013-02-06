@@ -58,6 +58,7 @@ public class StatsHandler {
 		
 		String result = SqlConnector.getInstance().sendSelectQuery("SELECT random_quote FROM users WHERE nick = '" + login + "'");
 		double chance = (result == null || result.equals("")) ? 0.075 : 0.03;
+		if(message.endsWith("!")) chance += 0.2;
 		if(words.length > 6){
 			if(Math.random() < chance){
 				double rand = Math.random();
