@@ -8,6 +8,7 @@ import org.jibble.pircbot.User;
 
 public class StatsHandler {
 	private static StatsHandler instance;
+	private String nextLineSnagLogin = null;
 	
 	private String[] profanities =  { "fuck","cock", "dick", "cunt", "bitch", "shit", "piss", "nigger", "asshole", "faggot", "wank" };
 	private String[] conjunctions = { "and", "but", "or", "yet", "for", "nor", "so" };
@@ -46,6 +47,15 @@ public class StatsHandler {
 		SimpleBot.instance.sendMessage(target, message);
 	}
 	private void processRandomQuote(String channel, String login, String message, String[] words){
+		if(nextLineSnagLogin != null){
+			if(nextLineSnagLogin.equals("*") || nextLineSnagLogin.equals(login)){
+				nextLineSnagLogin = null;
+				setRandomQuote(login, message);
+				sendMessage(channel, "Snagged line on request.");
+				return;
+			}
+		}
+		
 		String result = SqlConnector.getInstance().sendSelectQuery("SELECT random_quote FROM users WHERE nick = '" + login + "'");
 		double chance = (result == null || result.equals("")) ? 0.075 : 0.03;
 		if(words.length > 6){
@@ -93,15 +103,20 @@ public class StatsHandler {
 	}
 
 	private void processEmoticons(String channel, String sender, String login, String hostname, String message, String[] words) {
+		int emoticonCount = 0;
 		if(login.equals("~Cadbury")) return;
 		for(String word : words){
 			for(int i = 0; i < Emoticons.emoticons.length; i++){
 				String emoticon = Emoticons.emoticons[i];
 				if(word.startsWith("http://")) continue;
 				if(word.equals(emoticon)){
+					emoticonCount++;
 					SqlConnector.getInstance().tryIncrementLastUsedBy("emoticons", "emoticon", emoticon, "frequency", login, "'"+ emoticon + "', 1, '" + login + "'");
 				}
 			}
+		}
+		if(emoticonCount > 4){
+			sendMessage(channel, "O.O I'm counting a lot of emoticons. You may want to inform baggerboot about this, as this might be a bug. Be sure to include the line you wrote: \"" + message + "\"");
 		}
 	}
 
@@ -197,5 +212,10 @@ public class StatsHandler {
 		if(sender.toLowerCase().startsWith("theevilp") && action.toLowerCase().startsWith("eats")){
 			SqlConnector.getInstance().tryIncrementVaria("evil_people_eaten");
 		}
+	}
+
+	public void snagNextLine(String string) {
+		nextLineSnagLogin = string;
+		
 	}
 }

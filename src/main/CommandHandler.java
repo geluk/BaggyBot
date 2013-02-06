@@ -57,13 +57,25 @@ public class CommandHandler {
 			if(params[1].equals("quote")){
 				sendMessage(channel, sender + ", For each line sent to the channel, if it contains more than 6 words, it has a 5% chance of becoming that user's random quote.");
 			}else if(params[1].equals("topics")){
-				sendMessage(channel, sender + ", Use -help <topic> to get help about a specific topic. Available topics are: login, quote");
+				sendMessage(channel, sender + ", Use -help <topic> to get help about a specific topic. Available topics are: login, quote, commands");
 			}else if(params[1].equals("login")){
 				sendMessage(channel, sender + ", Currently, people are identified by their login. This means that statistics are shared if you use webchat or if you haven't set up your login. Refer to your IRC client's documentation to find out how to set it up.");
+			}else if(params[1].equals("commands")){
+				sendMessage(channel, "The following commands are available for everyone to use: info/help/version, get, ping. Other commands are: ed, shutdown, query, tcm, set, del, mem, c*tricpuns++, snag.");
+				sendMessage(channel, "For help on a specific command, use -help <command>");
+			}else if(params[1].equals("get")){
+				if(params.length == 2)
+				sendMessage(channel, "Returns statistics data. Available parameters: quote, lines, glines. for more information, use -help get <parameter>");
+				else if(params[2].equals("quote"))
+				sendMessage(channel, "Returns the random quote for that user. Usage: -help get quote <username>");
+				else if(params[2].equals("lines"))
+				sendMessage(channel, "Returns the line count for that user. Usage: -help get lines <username>");
+				else if(params[2].equals("glines"))
+				sendMessage(channel, "Returns the global line count. No other parameters required. Usage: -help get glines");
 			}
 		
 		}else if(command.startsWith("info") || command.startsWith("help") || command.startsWith("version")){
-			SimpleBot.instance.sendMessage(channel, "StatsBot " + SimpleBot.version +" - made by baggerboot. Stats page: http://jgeluk.net/stats/ - For various help topics, use the '-help topics' command.");
+			SimpleBot.instance.sendMessage(channel, "StatsBot " + SimpleBot.version +" - made by baggerboot. Stats page: http://jgeluk.net/stats/ - To see a list of help topics, use the '-help topics' command.");
 		
 		
 		}else if(command.equals("tcm") && authorize(channel, login, hostname)){
@@ -74,7 +86,7 @@ public class CommandHandler {
 				SimpleBot.instance.sendMessage(channel, "'$g' and rems disabled.");
 			}
 		
-		}else if(command.startsWith("set ")){
+		}else if(command.startsWith("set ") && authorize(channel, login, hostname)){
 			if(params.length == 5 && params[1].equals("primary") && params[3].equals("for")){
 				String _login = params[4];
 				String newPrimary = params[2];
@@ -82,14 +94,16 @@ public class CommandHandler {
 				SimpleBot.instance.sendMessage(channel, sender + ", " + result);
 			}
 			
-		}else if(command.startsWith("get ") && authorize(channel, login, hostname)){
+		}else if(command.startsWith("get ")){
 			if(params.length == 2){
-				if(params[1].equals("mcapreached")){
-					if(gfy){
-						sendMessage(channel, sender + ", true.");
-					}else{
-						sendMessage(channel, sender + ", false.");
-					}
+				if(params[1].equals("glines")){
+					sendMessage(channel, sender + ", the global line count is " + SqlConnector.getInstance().sendSelectQuery("SELECT `value` FROM `varia` WHERE `key` = 'global_line_count'"));
+				}
+			}else if(params.length == 3){
+				if(params[1].equals("lines")){
+					sendMessage(channel, sender + ", " + params[2] + " has sent " + SqlConnector.getInstance().sendSelectQuery("SELECT `lines` FROM `users` LEFT JOIN alts ON `user`.`nick` = `alts`.login WHERE (`primary` = '" + params[2] + "` OR `additional` LIKE '%" + params[2] + "%')"));
+				}else if(params[1].equals("quote")){
+					sendMessage(channel, sender + ", " + params[2] + "'s random quote: " + SqlConnector.getInstance().sendSelectQuery("SELECT `random_quote` FROM `users` LEFT JOIN alts ON `user`.`nick` = `alts`.login WHERE (`primary` = '" + params[2] + "` OR `additional` LIKE '%" + params[2] + "%')"));
 				}
 			}
 			
@@ -134,9 +148,17 @@ public class CommandHandler {
 		}else if(command.equals("ping")){
 			SimpleBot.instance.sendMessage(channel, "Pong!");
 		
-		}else if(command.equals("queery")){
+		}else if(command.startsWith("queery")){
 			
 			sendMessage(channel, "Dohohohoho~");
+			
+		}else if(command.equals("snag") && authorize(channel, login, hostname)){
+			sendMessage(channel, "Snagging next line.");
+			StatsHandler.getInstance().snagNextLine("*");
+			
+		}else if(command.equals("snag ") && params.length > 1 && authorize(channel, login, hostname)){
+			sendMessage(channel, "Snagging next line by " + params[1]);
+			StatsHandler.getInstance().snagNextLine(params[1]);
 			
 		}else{
 			System.out.println("Ignoring invalid command.");
@@ -159,6 +181,8 @@ public class CommandHandler {
 		if(!(login.equals("~baggerboo") && hostname.equals("199.115.228.30"))){
 			if(command.contains("dick") || command.contains("fuck")){
 				sendMessage(channel, sender + ", how about you go " + command.substring(6));
+			}else if(!command.startsWith("SELECT") && !command.startsWith("UPDATE") && !command.startsWith("ALTER")){
+				sendMessage(channel, "Are you trying to screw with me now");
 			}else{
 				sendMessage(channel, sender + ": Only my master may do that ;~;");
 			}
