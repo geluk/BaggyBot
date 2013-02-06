@@ -11,7 +11,7 @@ import org.jibble.pircbot.*;
  * This is the main class for the bot.
  */
 
-public class SimpleBot extends PircBot{
+public class BaggyBot extends PircBot{
 	
 	// Which prefix to use for commands
 	private String commandIdentifier = "-";
@@ -30,7 +30,7 @@ public class SimpleBot extends PircBot{
 	private CommandHandler ch;
 	
 	// Should generate a getter for this at some point and update my code to use it. CBA to do it now.
-	public static SimpleBot instance;
+	public static BaggyBot instance;
 	
 	// List of all rems. Currently not persistent. Will eventually be saved in a MySQL database.
 	private Map<String, String> rems = new HashMap<String,String>();
@@ -39,7 +39,7 @@ public class SimpleBot extends PircBot{
 	public boolean cadburyMode = false;
 	
 	// Initializes some variables, shows login data and connects to the MySQL DB.
-	public SimpleBot(){
+	public BaggyBot(){
 		String name = SettingsManager.getInstance().getSetting("nick");
 		String login = SettingsManager.getInstance().getSetting("ident");
 		String port = SettingsManager.getInstance().getSetting("sqlport");
@@ -105,7 +105,7 @@ public class SimpleBot extends PircBot{
 	// Intializes the bot by creating an instance of it, having it connect to an IRC server and join a channel.
 	public static void main(String args[]) throws Exception{
 		splash();
-		SimpleBot bot = new SimpleBot();
+		BaggyBot bot = new BaggyBot();
 		System.out.println("\n==============================================");
 		System.out.println("Connecting to IRC server...");
 		bot.setVerbose(verbose);

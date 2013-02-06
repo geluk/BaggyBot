@@ -20,12 +20,12 @@ public class CommandHandler {
 		String command = message.substring(1);
 		String[] params = command.split(" ");
 		System.out.println("COMMAND: " + command);
-		if(SimpleBot.instance.cadburyMode){
+		if(BaggyBot.instance.cadburyMode){
 			if(command.startsWith("rem ")){
 				addRem(channel, sender, command);
 			}else if(command.startsWith("forget ")){
-				SimpleBot.instance.removeRemIfExists(command.substring("forget ".length()));
-				SimpleBot.instance.sendMessage(channel, "I have forgotten " + command.substring("forget ".length()) + ".");
+				BaggyBot.instance.removeRemIfExists(command.substring("forget ".length()));
+				BaggyBot.instance.sendMessage(channel, "I have forgotten " + command.substring("forget ".length()) + ".");
 			}else if(command.startsWith("g ")){
 				processGoogleSearch(channel, sender, command);
 			}else if(command.startsWith("gis ")){
@@ -33,21 +33,21 @@ public class CommandHandler {
 			}
 		}
 		if(command.startsWith("ed") && authorize(channel,login,hostname)){
-			if(SimpleBot.instance.unreadExceptions.size() > 0){
-				SimpleBot.instance.sendMessage(channel, "Last exception details: " + SimpleBot.instance.unreadExceptions.get(0));
-				SimpleBot.instance.unreadExceptions.remove(0);
+			if(BaggyBot.instance.unreadExceptions.size() > 0){
+				BaggyBot.instance.sendMessage(channel, "Last exception details: " + BaggyBot.instance.unreadExceptions.get(0));
+				BaggyBot.instance.unreadExceptions.remove(0);
 			}else{
-				SimpleBot.instance.sendMessage(channel, "No unread exceptions left.");
+				BaggyBot.instance.sendMessage(channel, "No unread exceptions left.");
 			}
 		
 		}else if(command.equals("shutdown") && authorize(channel, login, hostname)){
-			SimpleBot.instance.sendMessage(channel, shutdownMessages[new Random().nextInt(shutdownMessages.length)]);
+			BaggyBot.instance.sendMessage(channel, shutdownMessages[new Random().nextInt(shutdownMessages.length)]);
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			SimpleBot.instance.shutdown();
+			BaggyBot.instance.shutdown();
 		
 		}else if(command.startsWith("query ")){
 			processSqlCommand(channel, sender, login, hostname, command);
@@ -75,15 +75,15 @@ public class CommandHandler {
 			}
 		
 		}else if(command.startsWith("info") || command.startsWith("help") || command.startsWith("version")){
-			SimpleBot.instance.sendMessage(channel, "StatsBot " + SimpleBot.version +" - made by baggerboot. Stats page: http://jgeluk.net/stats/ - To see a list of help topics, use the '-help topics' command.");
+			BaggyBot.instance.sendMessage(channel, "StatsBot " + BaggyBot.version +" - made by baggerboot. Stats page: http://jgeluk.net/stats/ - To see a list of help topics, use the '-help topics' command.");
 		
 		
 		}else if(command.equals("tcm") && authorize(channel, login, hostname)){
-			SimpleBot.instance.cadburyMode = !SimpleBot.instance.cadburyMode;
-			if(SimpleBot.instance.cadburyMode){
-				SimpleBot.instance.sendMessage(channel, "'$g' and rems enabled.");
+			BaggyBot.instance.cadburyMode = !BaggyBot.instance.cadburyMode;
+			if(BaggyBot.instance.cadburyMode){
+				BaggyBot.instance.sendMessage(channel, "'$g' and rems enabled.");
 			}else{
-				SimpleBot.instance.sendMessage(channel, "'$g' and rems disabled.");
+				BaggyBot.instance.sendMessage(channel, "'$g' and rems disabled.");
 			}
 		
 		}else if(command.startsWith("set ") && authorize(channel, login, hostname)){
@@ -91,7 +91,7 @@ public class CommandHandler {
 				String _login = params[4];
 				String newPrimary = params[2];
 				String result = SqlConnector.getInstance().sendQuery("UPDATE alts SET `primary` = '" + newPrimary + "' WHERE `login` = '" + _login + "'");
-				SimpleBot.instance.sendMessage(channel, sender + ", " + result);
+				BaggyBot.instance.sendMessage(channel, sender + ", " + result);
 			}
 			
 		}else if(command.startsWith("get ")){
@@ -111,7 +111,7 @@ public class CommandHandler {
 			if(command.substring("del ".length()).startsWith("word")){
 				String word = command.substring("del word ".length());
 				SqlConnector.getInstance().sendQuery("DELETE FROM words WHERE word = '" + word + "'");
-				SimpleBot.instance.sendMessage(channel, sender + ", I have removed " + word + " from the words list.");
+				BaggyBot.instance.sendMessage(channel, sender + ", I have removed " + word + " from the words list.");
 			}
 			
 		}else if(command.startsWith("mem")){
@@ -133,10 +133,10 @@ public class CommandHandler {
 		
 		}else if(command.equals("citricpuns++") && (login.equals("~baggerboo") || login.equals("~citricsqu"))){
 			SqlConnector.getInstance().tryIncrementVaria("citricpuns");
-			SimpleBot.instance.sendMessage(channel, sender + ", done.");
+			BaggyBot.instance.sendMessage(channel, sender + ", done.");
 		
 		
-		}else if(SimpleBot.instance.cadburyMode){
+		}else if(BaggyBot.instance.cadburyMode){
 			processRem(channel, sender, login, hostname, command);
 		
 		
@@ -146,7 +146,7 @@ public class CommandHandler {
 		
 		
 		}else if(command.equals("ping")){
-			SimpleBot.instance.sendMessage(channel, "Pong!");
+			BaggyBot.instance.sendMessage(channel, "Pong!");
 		
 		}else if(command.startsWith("queery")){
 			
@@ -165,7 +165,7 @@ public class CommandHandler {
 		}
 	}
 	private void sendMessage(String channel, String message) {
-		SimpleBot.instance.sendMessage(channel, message);
+		BaggyBot.instance.sendMessage(channel, message);
 		
 	}
 	private boolean authorize(String channel, String login, String hostname){
@@ -228,9 +228,9 @@ public class CommandHandler {
 		}
 		for(int i = 0; i < lines.size(); i++){
 			if(i == 0){
-				SimpleBot.instance.sendMessage(channel, sender + ": " + lines.get(i));
+				BaggyBot.instance.sendMessage(channel, sender + ": " + lines.get(i));
 			}else{
-				SimpleBot.instance.sendMessage(channel, lines.get(i));
+				BaggyBot.instance.sendMessage(channel, lines.get(i));
 			}
 			
 		}
@@ -238,17 +238,17 @@ public class CommandHandler {
 
 	private void addRem(String channel, String sender, String command) {
 		String[] args = command.split(" ");
-		if(SimpleBot.instance.remExists(args[1])){
-			SimpleBot.instance.sendMessage(channel, "I already have something saved for " + args[1]);
+		if(BaggyBot.instance.remExists(args[1])){
+			BaggyBot.instance.sendMessage(channel, "I already have something saved for " + args[1]);
 		}else{
-			SimpleBot.instance.addRem(args[1], command.substring(4 + args[1].length()));
-			SimpleBot.instance.sendMessage(channel, "Added $" + args[1] + " to remlist.");
+			BaggyBot.instance.addRem(args[1], command.substring(4 + args[1].length()));
+			BaggyBot.instance.sendMessage(channel, "Added $" + args[1] + " to remlist.");
 		}
 	}
 	private void processRem(String channel, String sender, String login, String hostname, String command){
-		if(SimpleBot.instance.remExists(command)){
-			String definition = SimpleBot.instance.getRem(command);
-			SimpleBot.instance.sendMessage(channel, definition);
+		if(BaggyBot.instance.remExists(command)){
+			String definition = BaggyBot.instance.getRem(command);
+			BaggyBot.instance.sendMessage(channel, definition);
 		}
 	}	
 	/*private void processGoogleImageSearch(String channel, String sender, String command) {
@@ -286,8 +286,8 @@ public class CommandHandler {
 			url = new URL(google + URLEncoder.encode(search, charset));
 			reader = new InputStreamReader(url.openStream(), charset);
 		} catch (Exception e) {
-			SimpleBot.instance.sendMessage(channel, sender + ", something bad happened ;~;");
-			SimpleBot.instance.unreadExceptions.add(e.getMessage());
+			BaggyBot.instance.sendMessage(channel, sender + ", something bad happened ;~;");
+			BaggyBot.instance.unreadExceptions.add(e.getMessage());
 			e.printStackTrace();
 		}
 	    GoogleResults results = new Gson().fromJson(reader, GoogleResults.class);
@@ -297,6 +297,6 @@ public class CommandHandler {
 	    title = title.replace("<b>", "");
 	    title = title.replace("</b>", "");
 	    String URL = results.getResponseData().getResults().get(0).getUrl();
-	    SimpleBot.instance.sendMessage(channel, sender + ", " + title + ": " + URL);
+	    BaggyBot.instance.sendMessage(channel, sender + ", " + title + ": " + URL);
 	}
 }
