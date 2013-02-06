@@ -101,9 +101,9 @@ public class CommandHandler {
 				}
 			}else if(params.length == 3){
 				if(params[1].equals("lines")){
-					sendMessage(channel, sender + ", " + params[2] + " has sent " + SqlConnector.getInstance().sendSelectQuery("SELECT `lines` FROM `users` LEFT JOIN alts ON `user`.`nick` = `alts`.login WHERE (`primary` = '" + params[2] + "` OR `additional` LIKE '%" + params[2] + "%')"));
+					sendMessage(channel, sender + ", " + params[2] + " has sent " + SqlConnector.getInstance().sendSelectQuery("SELECT `lines` FROM `users` LEFT JOIN alts ON `user`.`nick` = `alts`.login WHERE (`primary` = '" + params[2] + "' OR `additional` LIKE '%" + params[2] + "%')"));
 				}else if(params[1].equals("quote")){
-					sendMessage(channel, sender + ", " + params[2] + "'s random quote: " + SqlConnector.getInstance().sendSelectQuery("SELECT `random_quote` FROM `users` LEFT JOIN alts ON `user`.`nick` = `alts`.login WHERE (`primary` = '" + params[2] + "` OR `additional` LIKE '%" + params[2] + "%')"));
+					sendMessage(channel, sender + ", " + params[2] + "'s random quote: " + SqlConnector.getInstance().sendSelectQuery("SELECT `random_quote` FROM `users` LEFT JOIN alts ON `user`.`nick` = `alts`.login WHERE (`primary` = '" + params[2] + "' OR `additional` LIKE '%" + params[2] + "%')"));
 				}
 			}
 			
