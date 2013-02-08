@@ -1,5 +1,6 @@
 package main;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,16 +17,18 @@ public class BaggyBot extends PircBot{
 	// Which prefix to use for commands
 	private String commandIdentifier = "-";
 	
+	private List<String> queuedMessages = new ArrayList<String>();
+	
 	// The current version of the bot. Only increment this each time there is a release.
 	// Convention: (milestone).(major)[.(minor).[(revision/bugfix)]]
-	public static final String version = "1.7.2";
+	public static final String version = "1.8.2.2";
 	
 	// More debug output?
 	private static final boolean verbose = false;
 	
 	// UGLY EWW EWW UGLY this list contains all exception messages so they can be read directly from irc,
 	// using the -ed command.
-	public List<String> unreadExceptions = new ArrayList<String>();
+	public List<Exception> unreadExceptions = new ArrayList<Exception>();
 	
 	private CommandHandler ch;
 	
@@ -99,22 +102,39 @@ public class BaggyBot extends PircBot{
 		// Automatically disable cadbury mode if Cadbury joins the channel
 		if(login.equals("~Cadbury")){
 			cadburyMode = false;
+		}else if(login.equals(super.getLogin())){
+			for(int i = 0; i < queuedMessages.size(); i++){
+				sendMessage(channel, queuedMessages.get(i));
+			}
+			queuedMessages.clear();
 		}
 	}
-	// THROWS EXCEPTION EWW EWWW UGLY
+
 	// Intializes the bot by creating an instance of it, having it connect to an IRC server and join a channel.
-	public static void main(String args[]) throws Exception{
+	public static void main(String args[]){
 		splash();
+		Logger.log("Starting BaggyBot v" + version + "...");
 		BaggyBot bot = new BaggyBot();
 		System.out.println("\n==============================================");
 		System.out.println("Connecting to IRC server...");
 		bot.setVerbose(verbose);
-		bot.connect("irc.esper.net");
+		try {
+			bot.connect("irc.esper.net");
+		} catch (IOException | IrcException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
 		System.out.println("   Done");
 		String channel = SettingsManager.getInstance().getSetting("channel");
 		System.out.println("Joining " + channel);
 		bot.joinChannel(channel);
 		System.out.println("Ready to serve.");
+		
+		if(args.length > 1 && args[0].equals("-update")){
+			if(args[1].equals("success"))bot.sendMessage(channel, "Succesfully updated to version " + version);
+			else if(args[1].equals("sameversion"))bot.sendMessage(channel, "Failed to update: No newer version available.");
+			else if(args[1].equals("nofile"))bot.sendMessage(channel, "Failed to update: Bot is already on the latest version.");
+		}
 	}
 	
 	// This was not cheaply copied from Cadbury's source or anything. Nope. Not at all.
@@ -148,11 +168,28 @@ public class BaggyBot extends PircBot{
 	public String getRem(String rem){
 		return rems.get(rem);
 	}
-	// This /should/ disconnect the bot cleanly.
-	public void shutdown(){
+	
+	private void closeConnections(){
 		quitServer();
 		dispose();
 		SqlConnector.getInstance().disconnect();
+	}
+	
+	// This /should/ disconnect the bot cleanly.
+	public void shutdown(){
+		closeConnections();
 		System.exit(0);
+	}
+	public void update(){
+		closeConnections();
+		try {
+			Runtime.getRuntime().exec(new String[]{"bash","-c","~/bot/autoupdate.sh"});
+		} catch (IOException e) {
+			System.out.println("WARNING: Failed to run the update script. Please run it manually instead.");
+			e.printStackTrace();
+		}
+	}
+	public void queueMessage(String string) {
+		
 	}
 }

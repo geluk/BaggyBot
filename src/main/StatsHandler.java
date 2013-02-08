@@ -88,7 +88,7 @@ public class StatsHandler {
 	}
 
 	private void processAlts(String login, String sender) {
-		String dbLogin = SqlConnector.getInstance().sendSelectQuery("SELECT login FROM alts WHERE `login` = '" + login + "'");
+		String dbLogin = SqlConnector.getInstance().sendSelectQuery("SELECT `login` FROM alts WHERE `login` = '" + login + "'");
 		if(dbLogin.equals("") || dbLogin == null){
 			System.out.println("Creating new alt for " + login + ". Primary: " + sender);
 			SqlConnector.getInstance().sendQuery("INSERT INTO alts VALUES ('" + login + "', '" + sender + "', '')");
@@ -128,6 +128,7 @@ public class StatsHandler {
 		
 		int nickCount = 0;
 		for (String word : words) {
+			String wordCased = word;
 			word = word.toLowerCase();
 			for (User user : users) {
 				String nick = user.getNick().toLowerCase();
@@ -145,10 +146,12 @@ public class StatsHandler {
 					}
 				}
 			}
-			if (!word.startsWith("http://")) {
+			if (!word.startsWith("http://") && !word.startsWith("https://")) {
 				word = word.replaceAll("[^A-Za-z0-9]", "");
 			} else {
-				// Add support for URLs here later
+				if(wordCased.endsWith(".")) wordCased = wordCased.substring(0, wordCased.length()-1);
+				if(wordCased.endsWith("/")) wordCased = wordCased.substring(0, wordCased.length() -1);
+				SqlConnector.getInstance().tryIncrementLastUsedBy("urls", "url", wordCased, "uses", login,"'" + wordCased + "', 1, '" + login + "'");
 				continue;
 			}
 			if (word.equals("")) {
