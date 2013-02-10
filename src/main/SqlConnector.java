@@ -55,6 +55,19 @@ public class SqlConnector {
 	// This method will work if you have more than one result, but in that case using the sendSelectQueryArr (which returns a string array)
 	// would be recommended.
 	public String sendSelectQuery(String query){
+		/*String[] results = sendSelectQueryArr(query);
+		String result = "";
+		for(int i = 0; i < results.length; i++){
+			if(i == 0){
+				result = results[i];
+			}else{
+				result = result.concat(", " + results[i]);
+			}
+		}
+		return result;*/
+		return sendSelectQueryArr(query)[0];
+	}
+	public String sendSelectQueryMultiresult(String query){
 		String[] results = sendSelectQueryArr(query);
 		String result = "";
 		for(int i = 0; i < results.length; i++){
@@ -66,6 +79,7 @@ public class SqlConnector {
 		}
 		return result;
 	}
+	
 	// Adds an exception to the list of unread exceptions.
 	private void registerException(Exception e){
 		BaggyBot.instance.addException(e);

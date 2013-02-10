@@ -27,13 +27,12 @@ public class BaggyBot extends PircBot{
 	
 	// The current version of the bot. Only increment this each time there is a release.
 	// Convention: (milestone).(major)[.(minor).[(revision/bugfix)]]
-	public static final String version = "1.9";
+	public static final String version = "1.9.1.1";
 	
 	// More debug output?
 	private static final boolean verbose = false;
 	
-	// UGLY EWW EWW UGLY this list contains all exception messages so they can be read directly from irc,
-	// using the -ed command.
+	// This list contains all unread exceptions so they can be read directly from irc, using the -ed command.
 	private List<Exception> unreadExceptions = new ArrayList<Exception>();
 	
 	public boolean addException(Exception e) {
@@ -198,6 +197,7 @@ public class BaggyBot extends PircBot{
 		return rems.get(rem);
 	}
 	
+	// Closes all resources currently opened by the bot, allowing it to shut down cleanly.
 	private void closeConnections(){
 		Logger.log("[INFO] Closing all open resources.");
 		quitServer();
@@ -206,12 +206,12 @@ public class BaggyBot extends PircBot{
 		Logger.getInstance().close();
 	}
 	
-	// This /should/ disconnect the bot cleanly.
 	public void shutdown(){
 		closeConnections();
 		System.exit(0);
 	}
-	public void update(){
+	
+	public void downloadUpdate(){
 		sendMessage(getChannels()[0], "Downloading latest version...");
 		URL jarLocation = null;
 		try {
@@ -229,7 +229,7 @@ public class BaggyBot extends PircBot{
 		}
 		FileOutputStream fos= null;
 		try {
-			fos = new FileOutputStream("~/BaggyBot.jar");
+			fos = new FileOutputStream("baggybot_new.jar");
 		} catch (FileNotFoundException e) {
 			sendMessage(getChannels()[0], "Unable to create a new file: " + e.getMessage());
 			e.printStackTrace();
@@ -243,7 +243,8 @@ public class BaggyBot extends PircBot{
 			e.printStackTrace();
 			return;
 		}
-		
+	}
+	public void update(){
 		sendMessage(getChannels()[0], "Preparing to update... Current version: " + BaggyBot.version);
 		
 		Logger.log("[INFO] Preparing to update. Current version: " + version + ".");

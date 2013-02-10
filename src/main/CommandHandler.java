@@ -73,6 +73,9 @@ public class CommandHandler {
 			}
 			BaggyBot.instance.shutdown();
 		}else if(command.startsWith("update") && authorize(channel, login, hostname)){
+			if(params.length > 1 && params[1].equals("-d")){
+				BaggyBot.instance.downloadUpdate();
+			}
 			BaggyBot.instance.update();
 		}else if(command.startsWith("query ")){
 			processSqlCommand(channel, sender, login, hostname, command);
@@ -266,7 +269,6 @@ public class CommandHandler {
 		if(!authorize(channel, login, hostname)){
 			return;
 		}
-		
 		command = command.substring(6);
 		List<String> lines = new ArrayList<String>();
 		
