@@ -1,5 +1,15 @@
 package main;
 
+<<<<<<< HEAD:src/main/BaggyBot.java
+=======
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+>>>>>>> origin/Dev:src/main/BaggyBot.java
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,17 +26,45 @@ public class BaggyBot extends PircBot{
 	// Which prefix to use for commands
 	private String commandIdentifier = "-";
 	
+<<<<<<< HEAD:src/main/BaggyBot.java
 	// The current version of the bot. Only increment this each time there is a release.
 	// Convention: (milestone).(major)[.(minor).[(revision/bugfix)]]
 	public static final String version = "1.6.8.1";
+=======
+	private List<String> queuedMessages = new ArrayList<String>();
+	
+	// The current version of the bot. Only increment this each time there is a release.
+	// Convention: (milestone).(major)[.(minor).[(revision/bugfix)]]
+	public static final String version = "1.9.1.1";
+>>>>>>> origin/Dev:src/main/BaggyBot.java
 	
 	// More debug output?
 	private static final boolean verbose = false;
 	
+<<<<<<< HEAD:src/main/BaggyBot.java
 	// UGLY EWW EWW UGLY this list contains all exception messages so they can be read directly from irc,
 	// using the -ed command.
 	public List<String> unreadExceptions = new ArrayList<String>();
 	
+=======
+	// This list contains all unread exceptions so they can be read directly from irc, using the -ed command.
+	private List<Exception> unreadExceptions = new ArrayList<Exception>();
+	
+	public boolean addException(Exception e) {
+		StackTraceElement[] elements = e.getStackTrace();
+		String stackTrace = null;
+		for(int i = elements.length-1; i >= 0; i--){
+			StackTraceElement element = elements[i];
+			stackTrace += ("--> " +  element.getClassName() + ":" + element.getMethodName() + "() at line " + element.getLineNumber() +" ");
+		}
+		Logger.log("[WARNING] An exception occured: " + e.getMessage());
+		Logger.log(stackTrace);
+		return unreadExceptions.add(e);
+	}
+	public Exception readException(int arg0) {
+		return unreadExceptions.remove(arg0);
+	}
+>>>>>>> origin/Dev:src/main/BaggyBot.java
 	private CommandHandler ch;
 	
 	// Should generate a getter for this at some point and update my code to use it. CBA to do it now.
@@ -99,22 +137,64 @@ public class BaggyBot extends PircBot{
 		// Automatically disable cadbury mode if Cadbury joins the channel
 		if(login.equals("~Cadbury")){
 			cadburyMode = false;
+<<<<<<< HEAD:src/main/BaggyBot.java
 		}
 	}
 	// THROWS EXCEPTION EWW EWWW UGLY
 	// Intializes the bot by creating an instance of it, having it connect to an IRC server and join a channel.
 	public static void main(String args[]) throws Exception{
 		splash();
+=======
+		}else if(login.equals(super.getLogin())){
+			for(int i = 0; i < queuedMessages.size(); i++){
+				sendMessage(channel, queuedMessages.get(i));
+			}
+			queuedMessages.clear();
+		}
+	}
+
+	// Intializes the bot by creating an instance of it, having it connect to an IRC server and join a channel.
+	public static void main(String args[]){
+		splash();
+		Logger.log("Starting BaggyBot v" + version + "...");
+>>>>>>> origin/Dev:src/main/BaggyBot.java
 		BaggyBot bot = new BaggyBot();
 		System.out.println("\n==============================================");
 		System.out.println("Connecting to IRC server...");
 		bot.setVerbose(verbose);
+<<<<<<< HEAD:src/main/BaggyBot.java
 		bot.connect("irc.esper.net");
+=======
+		try {
+			bot.connect("irc.esper.net");
+		} catch (IOException | IrcException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+>>>>>>> origin/Dev:src/main/BaggyBot.java
 		System.out.println("   Done");
 		String channel = SettingsManager.getInstance().getSetting("channel");
 		System.out.println("Joining " + channel);
 		bot.joinChannel(channel);
 		System.out.println("Ready to serve.");
+<<<<<<< HEAD:src/main/BaggyBot.java
+=======
+		
+		if(args.length > 1 && args[0].equals("-update")){
+			if(args[1].equals("success")){
+				bot.sendMessage(channel, "Succesfully updated to version " + version);
+				Logger.log("Succesfully updated to version " + version);
+			}
+			else if(args[1].equals("sameversion")){
+				bot.sendMessage(channel, "Failed to update: No newer version available.");
+				Logger.log("Failed to update: No newer version available.");
+			}
+			else if(args[1].equals("nofile")){
+				bot.sendMessage(channel, "Failed to update: Bot is already on the latest version.");
+				Logger.log("Failed to update: Bot is already on the latest version.");
+			}
+		}
+>>>>>>> origin/Dev:src/main/BaggyBot.java
 	}
 	
 	// This was not cheaply copied from Cadbury's source or anything. Nope. Not at all.
@@ -148,6 +228,7 @@ public class BaggyBot extends PircBot{
 	public String getRem(String rem){
 		return rems.get(rem);
 	}
+<<<<<<< HEAD:src/main/BaggyBot.java
 	// This /should/ disconnect the bot cleanly.
 	public void shutdown(){
 		quitServer();
@@ -155,4 +236,72 @@ public class BaggyBot extends PircBot{
 		SqlConnector.getInstance().disconnect();
 		System.exit(0);
 	}
+=======
+	
+	// Closes all resources currently opened by the bot, allowing it to shut down cleanly.
+	private void closeConnections(){
+		Logger.log("[INFO] Closing all open resources.");
+		quitServer();
+		dispose();
+		SqlConnector.getInstance().disconnect();
+		Logger.getInstance().close();
+	}
+	
+	public void shutdown(){
+		closeConnections();
+		System.exit(0);
+	}
+	
+	public void downloadUpdate(){
+		sendMessage(getChannels()[0], "Downloading latest version...");
+		URL jarLocation = null;
+		try {
+			jarLocation = new URL("http://home1.jgeluk.net/files/BaggyBot.jar");
+		} catch (MalformedURLException e) {
+			sendMessage(getChannels()[0], "Unable to download the latest version: " + e.getMessage());
+			e.printStackTrace();
+		}
+		ReadableByteChannel rbc = null;
+		try {
+			rbc = Channels.newChannel(jarLocation.openStream());
+		} catch (IOException e) {
+			sendMessage(getChannels()[0], "Unable to open a connection with the server: " + e.getMessage());
+			e.printStackTrace();
+		}
+		FileOutputStream fos= null;
+		try {
+			fos = new FileOutputStream("baggybot_new.jar");
+		} catch (FileNotFoundException e) {
+			sendMessage(getChannels()[0], "Unable to create a new file: " + e.getMessage());
+			e.printStackTrace();
+		}
+		try {
+			fos.getChannel().transferFrom(rbc, 0, 1 << 24);
+			fos.close();
+			rbc.close();
+		} catch (IOException e) {
+			sendMessage(getChannels()[0], "Unable to save the downloaded file: " + e.getMessage());
+			e.printStackTrace();
+			return;
+		}
+	}
+	public void update(){
+		sendMessage(getChannels()[0], "Preparing to update... Current version: " + BaggyBot.version);
+		
+		Logger.log("[INFO] Preparing to update. Current version: " + version + ".");
+		closeConnections();
+		try {
+			Runtime.getRuntime().exec(new String[]{"bash","-c","~/bot/autoupdate.sh"});
+		} catch (IOException e) {
+			System.out.println("WARNING: Failed to run the update script. Please run it manually instead.");
+			e.printStackTrace();
+		}
+	}
+	public void queueMessage(String string) {
+		queuedMessages.add(string);
+	}
+	public boolean unreadExceptionsAvailable() {
+		return !unreadExceptions.isEmpty();
+	}
+>>>>>>> origin/Dev:src/main/BaggyBot.java
 }
