@@ -132,7 +132,7 @@ public class BaggyBot extends PircBot{
 	// Intializes the bot by creating an instance of it, having it connect to an IRC server and join a channel.
 	public static void main(String args[]){
 		splash();
-		Logger.log("Starting BaggyBot v" + version + "...");
+		Logger.log("[INFO] Starting BaggyBot v" + version + "...");
 		BaggyBot bot = new BaggyBot();
 		System.out.println("\n==============================================");
 		System.out.println("Connecting to IRC server...");
@@ -152,15 +152,15 @@ public class BaggyBot extends PircBot{
 		if(args.length > 1 && args[0].equals("-update")){
 			if(args[1].equals("success")){
 				bot.sendMessage(channel, "Succesfully updated to version " + version);
-				Logger.log("Succesfully updated to version " + version);
+				Logger.log("[INFO] Succesfully updated to version " + version);
 			}
 			else if(args[1].equals("sameversion")){
 				bot.sendMessage(channel, "Failed to update: No newer version available.");
-				Logger.log("Failed to update: No newer version available.");
+				Logger.log("[INFO] Failed to update: No newer version available.");
 			}
 			else if(args[1].equals("nofile")){
 				bot.sendMessage(channel, "Failed to update: Bot is already on the latest version.");
-				Logger.log("Failed to update: Bot is already on the latest version.");
+				Logger.log("[INFO] Failed to update: Bot is already on the latest version.");
 			}
 		}
 	}
