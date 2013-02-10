@@ -151,6 +151,7 @@ public class StatsHandler {
 			} else {
 				if(wordCased.endsWith(".")) wordCased = wordCased.substring(0, wordCased.length()-1);
 				if(wordCased.endsWith("/")) wordCased = wordCased.substring(0, wordCased.length() -1);
+				wordCased = wordCased.replace("'", "''");
 				SqlConnector.getInstance().tryIncrementLastUsedBy("urls", "url", wordCased, "uses", login,"'" + wordCased + "', 1, '" + login + "'");
 				continue;
 			}

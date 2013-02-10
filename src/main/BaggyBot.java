@@ -1,6 +1,12 @@
 package main;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,15 +27,29 @@ public class BaggyBot extends PircBot{
 	
 	// The current version of the bot. Only increment this each time there is a release.
 	// Convention: (milestone).(major)[.(minor).[(revision/bugfix)]]
-	public static final String version = "1.8.2.2";
+	public static final String version = "1.9";
 	
 	// More debug output?
 	private static final boolean verbose = false;
 	
 	// UGLY EWW EWW UGLY this list contains all exception messages so they can be read directly from irc,
 	// using the -ed command.
-	public List<Exception> unreadExceptions = new ArrayList<Exception>();
+	private List<Exception> unreadExceptions = new ArrayList<Exception>();
 	
+	public boolean addException(Exception e) {
+		StackTraceElement[] elements = e.getStackTrace();
+		String stackTrace = null;
+		for(int i = elements.length-1; i >= 0; i--){
+			StackTraceElement element = elements[i];
+			stackTrace += ("--> " +  element.getClassName() + ":" + element.getMethodName() + "() at line " + element.getLineNumber() +" ");
+		}
+		Logger.log("[WARNING] An exception occured: " + e.getMessage());
+		Logger.log(stackTrace);
+		return unreadExceptions.add(e);
+	}
+	public Exception readException(int arg0) {
+		return unreadExceptions.remove(arg0);
+	}
 	private CommandHandler ch;
 	
 	// Should generate a getter for this at some point and update my code to use it. CBA to do it now.
@@ -131,9 +151,18 @@ public class BaggyBot extends PircBot{
 		System.out.println("Ready to serve.");
 		
 		if(args.length > 1 && args[0].equals("-update")){
-			if(args[1].equals("success"))bot.sendMessage(channel, "Succesfully updated to version " + version);
-			else if(args[1].equals("sameversion"))bot.sendMessage(channel, "Failed to update: No newer version available.");
-			else if(args[1].equals("nofile"))bot.sendMessage(channel, "Failed to update: Bot is already on the latest version.");
+			if(args[1].equals("success")){
+				bot.sendMessage(channel, "Succesfully updated to version " + version);
+				Logger.log("Succesfully updated to version " + version);
+			}
+			else if(args[1].equals("sameversion")){
+				bot.sendMessage(channel, "Failed to update: No newer version available.");
+				Logger.log("Failed to update: No newer version available.");
+			}
+			else if(args[1].equals("nofile")){
+				bot.sendMessage(channel, "Failed to update: Bot is already on the latest version.");
+				Logger.log("Failed to update: Bot is already on the latest version.");
+			}
 		}
 	}
 	
@@ -170,9 +199,11 @@ public class BaggyBot extends PircBot{
 	}
 	
 	private void closeConnections(){
+		Logger.log("[INFO] Closing all open resources.");
 		quitServer();
 		dispose();
 		SqlConnector.getInstance().disconnect();
+		Logger.getInstance().close();
 	}
 	
 	// This /should/ disconnect the bot cleanly.
@@ -181,6 +212,41 @@ public class BaggyBot extends PircBot{
 		System.exit(0);
 	}
 	public void update(){
+		sendMessage(getChannels()[0], "Downloading latest version...");
+		URL jarLocation = null;
+		try {
+			jarLocation = new URL("http://home1.jgeluk.net/files/BaggyBot.jar");
+		} catch (MalformedURLException e) {
+			sendMessage(getChannels()[0], "Unable to download the latest version: " + e.getMessage());
+			e.printStackTrace();
+		}
+		ReadableByteChannel rbc = null;
+		try {
+			rbc = Channels.newChannel(jarLocation.openStream());
+		} catch (IOException e) {
+			sendMessage(getChannels()[0], "Unable to open a connection with the server: " + e.getMessage());
+			e.printStackTrace();
+		}
+		FileOutputStream fos= null;
+		try {
+			fos = new FileOutputStream("~/BaggyBot.jar");
+		} catch (FileNotFoundException e) {
+			sendMessage(getChannels()[0], "Unable to create a new file: " + e.getMessage());
+			e.printStackTrace();
+		}
+		try {
+			fos.getChannel().transferFrom(rbc, 0, 1 << 24);
+			fos.close();
+			rbc.close();
+		} catch (IOException e) {
+			sendMessage(getChannels()[0], "Unable to save the downloaded file: " + e.getMessage());
+			e.printStackTrace();
+			return;
+		}
+		
+		sendMessage(getChannels()[0], "Preparing to update... Current version: " + BaggyBot.version);
+		
+		Logger.log("[INFO] Preparing to update. Current version: " + version + ".");
 		closeConnections();
 		try {
 			Runtime.getRuntime().exec(new String[]{"bash","-c","~/bot/autoupdate.sh"});
@@ -190,6 +256,9 @@ public class BaggyBot extends PircBot{
 		}
 	}
 	public void queueMessage(String string) {
-		
+		queuedMessages.add(string);
+	}
+	public boolean unreadExceptionsAvailable() {
+		return !unreadExceptions.isEmpty();
 	}
 }

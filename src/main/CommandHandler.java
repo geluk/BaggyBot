@@ -34,8 +34,12 @@ public class CommandHandler {
 				
 			}else if(command.startsWith("g ")){
 				processGoogleSearch(channel, sender, command);
+			/*}else if(command.startsWith("mcf ")){
+				processGoogleSearch(channel, sender, "site:minecraftforum.net " + command);
+			}else if(command.startsWith("y ")){
+				processGoogleSearch(channel, sender, "site:youtube.com " + command);*/
 			}else if(command.startsWith("gis ")){
-				//processGoogleImageSearch(channel,sender,command);
+				processGoogleImageSearch(channel,sender,command);
 			}else if(command.startsWith("ur ")){
 				processUrbanLookup(channel, sender, login, hostname, params[1]);
 			}else if(command.startsWith("u ")){
@@ -54,15 +58,8 @@ public class CommandHandler {
 			}
 		}
 		if(command.startsWith("ed") && authorize(channel,login,hostname)){
-			if(BaggyBot.instance.unreadExceptions.size() > 0){
-				if(params.length > 1 && params[1].equals("st")){
-					BaggyBot.instance.sendMessage(channel, "Last exception details: " + BaggyBot.instance.unreadExceptions.get(0).getMessage());
-					BaggyBot.instance.sendMessage(channel, "Stacktrace: " + BaggyBot.instance.unreadExceptions.get(0).getStackTrace().toString());
-				}else{
-					BaggyBot.instance.sendMessage(channel, "Last exception details: " + BaggyBot.instance.unreadExceptions.get(0).getMessage());
-				}
-				
-				BaggyBot.instance.unreadExceptions.remove(0);
+			if(BaggyBot.instance.unreadExceptionsAvailable()){
+				BaggyBot.instance.sendMessage(channel, "Last exception details: " + BaggyBot.instance.readException(0).getMessage());
 			}else{
 				BaggyBot.instance.sendMessage(channel, "No unread exceptions left.");
 			}
@@ -76,19 +73,19 @@ public class CommandHandler {
 			}
 			BaggyBot.instance.shutdown();
 		}else if(command.startsWith("update") && authorize(channel, login, hostname)){
-			BaggyBot.instance.sendMessage(channel, "Preparing to update... Current version: " + BaggyBot.instance.version);
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 			BaggyBot.instance.update();
-			
 		}else if(command.startsWith("query ")){
 			processSqlCommand(channel, sender, login, hostname, command);
 			
 		
-		}else if(command.startsWith("help ")){
+		}else if(command.startsWith("ffl") && authorize(channel, login, hostname)){
+			if(Logger.getInstance().flush()){
+				sendMessage(channel, "Successfully flushed the log file.");
+			}else{
+				sendMessage(channel, "Failed to flush the log file.");
+			}
+		}
+		else if(command.startsWith("help ")){
 			if(params[1].equals("quote")){
 				sendMessage(channel, sender + ", For each line sent to the channel, if it contains more than 6 words, it has a 5% chance of becoming that user's random quote.");
 			}else if(params[1].equals("topics")){
@@ -164,11 +161,14 @@ public class CommandHandler {
 		    long allocatedMemory = runtime.totalMemory();
 		    long freeMemory = runtime.freeMemory();
 
-		    sb.append("free memory: " + format.format(freeMemory / 1024) + "<br/>");
-		    sb.append("allocated memory: " + format.format(allocatedMemory / 1024) + "<br/>");
-		    sb.append("max memory: " + format.format(maxMemory / 1024) + "<br/>");
-		    sb.append("total free memory: " + format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024) + "<br/>");
+		    sb.append("free memory: " + format.format(freeMemory / 1024));
+		    sb.append(" - allocated memory: " + format.format(allocatedMemory / 1024));
+		    sb.append(" - max memory: " + format.format(maxMemory / 1024));
+		    sb.append(" - total free memory: " + format.format((freeMemory + (maxMemory - allocatedMemory)) / 1024));
 		    System.out.println(sb.toString());
+		    if(params.length > 1 && params[1].equals("-c")){
+		    	sendMessage(channel, sender + ", " + sb.toString());
+		    }
 		
 		
 		}else if(command.equals("citricpuns++") && (login.equals("~baggerboo") || login.equals("~citricsqu"))){
@@ -177,7 +177,7 @@ public class CommandHandler {
 		
 		
 		}else if(command.equals("calc ")){
-			String formattedStatement = command.substring("calc ".length()).replaceAll(" ", "");
+			//String formattedStatement = command.substring("calc ".length()).replaceAll(" ", "");
 			
 		
 		
@@ -192,7 +192,7 @@ public class CommandHandler {
 			sendMessage(channel, "Snagging next line.");
 			StatsHandler.getInstance().snagNextLine("*");
 			
-		}else if(command.equals("snag ") && params.length > 1 && authorize(channel, login, hostname)){
+		}else if(command.startsWith("snag ") && params.length > 1 && authorize(channel, login, hostname)){
 			sendMessage(channel, "Snagging next line by " + params[1]);
 			StatsHandler.getInstance().snagNextLine(params[1]);
 			
@@ -212,17 +212,15 @@ public class CommandHandler {
 
 	    URL url;
 	    Reader reader = null;
-	    System.out.println("Connecting to server...");
 		try {
 			url = new URL(urban + URLEncoder.encode(search, charset));
 			reader = new InputStreamReader(url.openStream(), charset);
 		} catch (Exception e) {
 			System.out.println("Exception! " + e.getMessage());
 			BaggyBot.instance.sendMessage(channel, sender + ", something bad happened ;~;");
-			BaggyBot.instance.unreadExceptions.add(e);
+			BaggyBot.instance.addException(e);
 			e.printStackTrace();
 		}
-		System.out.println("Done!");
 		BufferedReader bReader = new BufferedReader(reader);
 		String result = sender + ", looks like something went wrong :(";
 		String line = null;
@@ -260,30 +258,19 @@ public class CommandHandler {
 		if(login.equals("~baggerboo") && hostname.equals("199.115.228.30")){
 			return true;
 		}else{
-			
+			sendMessage(channel, "You are not authorized to use this command.");
 			return false;
 		}
 	}
-	
 	private void processSqlCommand(String channel, String sender, String login, String hostname, String command) {
-		if(!(login.equals("~baggerboo") && hostname.equals("199.115.228.30"))){
-			if(command.contains("dick") || command.contains("fuck")){
-				sendMessage(channel, sender + ", how about you go " + command.substring(6));
-			}else if(!command.startsWith("SELECT") && !command.startsWith("UPDATE") && !command.startsWith("ALTER")){
-				sendMessage(channel, "Are you trying to screw with me now");
-			}else{
-				sendMessage(channel, sender + ": Only my master may do that ;~;");
-			}
+		if(!authorize(channel, login, hostname)){
 			return;
 		}
+		
 		command = command.substring(6);
 		List<String> lines = new ArrayList<String>();
 		
 		if(command.toLowerCase().startsWith("select")){
-			if(command.toLowerCase().startsWith("go fuck yourself") || command.startsWith("fuck yourself")){
-				sendMessage(channel, "No, how about you go fuck yourself. That seems like a better plan.");
-				return;
-			}
 			try {
 				String[] results = SqlConnector.getInstance().sendSelectQueryArr(command);
 				for(int i = 0; i < results.length; i++){
@@ -322,7 +309,6 @@ public class CommandHandler {
 			
 		}
 	}
-
 	private void addRem(String channel, String sender, String command) {
 		String[] args = command.split(" ");
 		
@@ -349,9 +335,9 @@ public class CommandHandler {
 			}
 			definition = definition.replace("{SENDER}", sender);
 			
-			sendMessage(channel, definition);
+			sendMessage(channel, definition.substring(1));
 		}
-	/*private void processGoogleImageSearch(String channel, String sender, String command) {
+	private void processGoogleImageSearch(String channel, String sender, String command) {
 		String search = command.substring(2);
 	    String google = "http://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=";
 	    String charset = "UTF-8";
@@ -362,19 +348,31 @@ public class CommandHandler {
 			url = new URL(google + URLEncoder.encode(search, charset));
 			reader = new InputStreamReader(url.openStream(), charset);
 		} catch (Exception e) {
-			SimpleBot.instance.sendMessage(channel, sender + ", something bad happened ;~;");
-			SimpleBot.instance.unreadExceptions.add(e.getMessage());
+			BaggyBot.instance.sendMessage(channel, sender + ", something bad happened ;~;");
+			BaggyBot.instance.addException(e);
 			e.printStackTrace();
 		}
-	    GoogleResults results = new Gson().fromJson(reader, GoogleResults.class);
+		BufferedReader bReader = new BufferedReader(reader);
+		String result = sender + ", looks like something went wrong :(";
+		String line = null;
+		try {
+			line = bReader.readLine();
+			System.out.println("Read line: " + line );
+			//System.out.println("D: " + definition + ", E: "+ example);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			
+		}
+		int iDStart = line.indexOf("\",\"unescapedUrl\":\"") + "\",\"unescapedUrl\":\"".length();
+		int iDEnd = line.indexOf("\",\"url\":\"");
+		
+		String definition = line.substring(iDStart, iDEnd);
 
-	    // Show title and URL of 1st result.
-	    String title = results.getResponseData().getResults().get(0).getTitle();
-	    title = title.replace("<b>", "");
-	    title = title.replace("</b>", "");
-	    String URL = results.getResponseData().getResults().get(0).getUrl();
-	    SimpleBot.instance.sendMessage(channel, sender + ", " + title + ": " + URL);
-	}*/
+		
+		result = sender + ", " + definition;
+		sendMessage(channel, result);
+	}
 	private void processGoogleSearch(String channel, String sender, String command){
 		String search = command.substring(2);
 	    String google = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=";
@@ -387,7 +385,7 @@ public class CommandHandler {
 			reader = new InputStreamReader(url.openStream(), charset);
 		} catch (Exception e) {
 			BaggyBot.instance.sendMessage(channel, sender + ", something bad happened ;~;");
-			BaggyBot.instance.unreadExceptions.add(e);
+			BaggyBot.instance.addException(e);
 			e.printStackTrace();
 		}
 	    GoogleResults results = new Gson().fromJson(reader, GoogleResults.class);

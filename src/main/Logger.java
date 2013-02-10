@@ -20,13 +20,25 @@ public class Logger {
 	public Logger(){
 		try {
 			logFile = new File("BaggyBot.log");
+			logFile.createNewFile();
 			fileWriter = new FileWriter(logFile);
 			writer = new BufferedWriter(fileWriter);
 		} catch (IOException e) {
 			e.printStackTrace();
-			BaggyBot.instance.queueMessage("WARNING: Failed to open the log file. Debug output will not be available.");
+			BaggyBot.instance.queueMessage("[WARNING] Failed to open the log file. Debug output will not be available.");
 			
 		}
+	}
+	public boolean flush(){
+		boolean success = true;
+		try {
+			writer.flush();
+		} catch (IOException e) {
+			BaggyBot.instance.addException(e);
+			e.printStackTrace();
+			success = false;
+		}
+		return success;
 	}
 	public static void log(String line){
 		if(instance == null) instance = new Logger();
@@ -36,7 +48,7 @@ public class Logger {
 		try {
 			writer.write(line + "\r\n");
 		} catch (IOException e) {
-			BaggyBot.instance.unreadExceptions.add(e);
+			BaggyBot.instance.addException(e);
 			e.printStackTrace();
 		}
 	}
@@ -44,7 +56,7 @@ public class Logger {
 		try {
 			writer.close();
 		} catch (IOException e) {
-			BaggyBot.instance.unreadExceptions.add(e);
+			BaggyBot.instance.addException(e);
 			e.printStackTrace();
 		}
 	}
