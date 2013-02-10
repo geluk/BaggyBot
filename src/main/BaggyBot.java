@@ -1,7 +1,5 @@
 package main;
 
-<<<<<<< HEAD:src/main/BaggyBot.java
-=======
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -9,7 +7,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
->>>>>>> origin/Dev:src/main/BaggyBot.java
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,27 +23,15 @@ public class BaggyBot extends PircBot{
 	// Which prefix to use for commands
 	private String commandIdentifier = "-";
 	
-<<<<<<< HEAD:src/main/BaggyBot.java
-	// The current version of the bot. Only increment this each time there is a release.
-	// Convention: (milestone).(major)[.(minor).[(revision/bugfix)]]
-	public static final String version = "1.6.8.1";
-=======
 	private List<String> queuedMessages = new ArrayList<String>();
 	
 	// The current version of the bot. Only increment this each time there is a release.
 	// Convention: (milestone).(major)[.(minor).[(revision/bugfix)]]
 	public static final String version = "1.9.1.1";
->>>>>>> origin/Dev:src/main/BaggyBot.java
 	
 	// More debug output?
 	private static final boolean verbose = false;
 	
-<<<<<<< HEAD:src/main/BaggyBot.java
-	// UGLY EWW EWW UGLY this list contains all exception messages so they can be read directly from irc,
-	// using the -ed command.
-	public List<String> unreadExceptions = new ArrayList<String>();
-	
-=======
 	// This list contains all unread exceptions so they can be read directly from irc, using the -ed command.
 	private List<Exception> unreadExceptions = new ArrayList<Exception>();
 	
@@ -64,7 +49,6 @@ public class BaggyBot extends PircBot{
 	public Exception readException(int arg0) {
 		return unreadExceptions.remove(arg0);
 	}
->>>>>>> origin/Dev:src/main/BaggyBot.java
 	private CommandHandler ch;
 	
 	// Should generate a getter for this at some point and update my code to use it. CBA to do it now.
@@ -137,14 +121,6 @@ public class BaggyBot extends PircBot{
 		// Automatically disable cadbury mode if Cadbury joins the channel
 		if(login.equals("~Cadbury")){
 			cadburyMode = false;
-<<<<<<< HEAD:src/main/BaggyBot.java
-		}
-	}
-	// THROWS EXCEPTION EWW EWWW UGLY
-	// Intializes the bot by creating an instance of it, having it connect to an IRC server and join a channel.
-	public static void main(String args[]) throws Exception{
-		splash();
-=======
 		}else if(login.equals(super.getLogin())){
 			for(int i = 0; i < queuedMessages.size(); i++){
 				sendMessage(channel, queuedMessages.get(i));
@@ -157,28 +133,21 @@ public class BaggyBot extends PircBot{
 	public static void main(String args[]){
 		splash();
 		Logger.log("Starting BaggyBot v" + version + "...");
->>>>>>> origin/Dev:src/main/BaggyBot.java
 		BaggyBot bot = new BaggyBot();
 		System.out.println("\n==============================================");
 		System.out.println("Connecting to IRC server...");
 		bot.setVerbose(verbose);
-<<<<<<< HEAD:src/main/BaggyBot.java
-		bot.connect("irc.esper.net");
-=======
 		try {
 			bot.connect("irc.esper.net");
 		} catch (IOException | IrcException e) {
 			e.printStackTrace();
 			System.exit(-1);
 		}
->>>>>>> origin/Dev:src/main/BaggyBot.java
 		System.out.println("   Done");
 		String channel = SettingsManager.getInstance().getSetting("channel");
 		System.out.println("Joining " + channel);
 		bot.joinChannel(channel);
 		System.out.println("Ready to serve.");
-<<<<<<< HEAD:src/main/BaggyBot.java
-=======
 		
 		if(args.length > 1 && args[0].equals("-update")){
 			if(args[1].equals("success")){
@@ -194,7 +163,6 @@ public class BaggyBot extends PircBot{
 				Logger.log("Failed to update: Bot is already on the latest version.");
 			}
 		}
->>>>>>> origin/Dev:src/main/BaggyBot.java
 	}
 	
 	// This was not cheaply copied from Cadbury's source or anything. Nope. Not at all.
@@ -228,15 +196,6 @@ public class BaggyBot extends PircBot{
 	public String getRem(String rem){
 		return rems.get(rem);
 	}
-<<<<<<< HEAD:src/main/BaggyBot.java
-	// This /should/ disconnect the bot cleanly.
-	public void shutdown(){
-		quitServer();
-		dispose();
-		SqlConnector.getInstance().disconnect();
-		System.exit(0);
-	}
-=======
 	
 	// Closes all resources currently opened by the bot, allowing it to shut down cleanly.
 	private void closeConnections(){
@@ -303,5 +262,4 @@ public class BaggyBot extends PircBot{
 	public boolean unreadExceptionsAvailable() {
 		return !unreadExceptions.isEmpty();
 	}
->>>>>>> origin/Dev:src/main/BaggyBot.java
 }

@@ -33,11 +33,7 @@ public class SqlConnector {
 		} catch (SQLException e) {
 			System.out.println("Unable to establish a connection to the SQL server:");
 			e.printStackTrace();
-<<<<<<< HEAD
-			BaggyBot.instance.unreadExceptions.add(e.getMessage());
-=======
 			BaggyBot.instance.addException(e);
->>>>>>> origin/Dev
 			return;
 		}
 		hasConnected = true;
@@ -59,8 +55,6 @@ public class SqlConnector {
 	// This method will work if you have more than one result, but in that case using the sendSelectQueryArr (which returns a string array)
 	// would be recommended.
 	public String sendSelectQuery(String query){
-<<<<<<< HEAD
-=======
 		/*String[] results = sendSelectQueryArr(query);
 		String result = "";
 		for(int i = 0; i < results.length; i++){
@@ -74,7 +68,6 @@ public class SqlConnector {
 		return sendSelectQueryArr(query)[0];
 	}
 	public String sendSelectQueryMultiresult(String query){
->>>>>>> origin/Dev
 		String[] results = sendSelectQueryArr(query);
 		String result = "";
 		for(int i = 0; i < results.length; i++){
@@ -86,16 +79,10 @@ public class SqlConnector {
 		}
 		return result;
 	}
-<<<<<<< HEAD
-	// Adds an exception to the list of unread exceptions.
-	private void registerException(Exception e){
-		BaggyBot.instance.unreadExceptions.add(e.getMessage());
-=======
 	
 	// Adds an exception to the list of unread exceptions.
 	private void registerException(Exception e){
 		BaggyBot.instance.addException(e);
->>>>>>> origin/Dev
 	}
 	// Returns a string array containing all results. Only use this when your SQL query will return one column.
 	public String[] sendSelectQueryArr(String query){

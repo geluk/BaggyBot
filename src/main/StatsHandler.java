@@ -8,10 +8,7 @@ import org.jibble.pircbot.User;
 
 public class StatsHandler {
 	private static StatsHandler instance;
-<<<<<<< HEAD
-=======
 	private String nextLineSnagLogin = null;
->>>>>>> origin/Dev
 	
 	private String[] profanities =  { "fuck","cock", "dick", "cunt", "bitch", "shit", "piss", "nigger", "asshole", "faggot", "wank" };
 	private String[] conjunctions = { "and", "but", "or", "yet", "for", "nor", "so" };
@@ -43,15 +40,6 @@ public class StatsHandler {
 		}
 		else if(message.toLowerCase().contains("fuck you baggybot") || message.toLowerCase().contains("fuck off baggerboot")){
 			sendMessage(channel, sender + ", I love you too <3");
-<<<<<<< HEAD
-//			<_Rogue_> also don't double click it next time :p
-//			<BaggyBot> Snagged!
-//			<_Rogue_> fuck you BaggyBot
-//			<BaggyBot> _Rogue_, I love you too <3
-//			<_Rogue_> kjvfhdsjklfmdsabjldflkdsmnsdkfs
-//			<_Rogue_> BAGGERBOOT YOU ASS
-=======
->>>>>>> origin/Dev
 		}
 	}
 
@@ -59,10 +47,6 @@ public class StatsHandler {
 		BaggyBot.instance.sendMessage(target, message);
 	}
 	private void processRandomQuote(String channel, String login, String message, String[] words){
-<<<<<<< HEAD
-		String result = SqlConnector.getInstance().sendSelectQuery("SELECT random_quote FROM users WHERE nick = '" + login + "'");
-		double chance = (result == null || result.equals("")) ? 0.075 : 0.03;
-=======
 		if(nextLineSnagLogin != null){
 			if(nextLineSnagLogin.equals("*") || nextLineSnagLogin.equals(login)){
 				nextLineSnagLogin = null;
@@ -75,7 +59,6 @@ public class StatsHandler {
 		String result = SqlConnector.getInstance().sendSelectQuery("SELECT random_quote FROM users WHERE nick = '" + login + "'");
 		double chance = (result == null || result.equals("")) ? 0.075 : 0.03;
 		if(message.endsWith("!")) chance += 0.2;
->>>>>>> origin/Dev
 		if(words.length > 6){
 			if(Math.random() < chance){
 				double rand = Math.random();
@@ -105,11 +88,7 @@ public class StatsHandler {
 	}
 
 	private void processAlts(String login, String sender) {
-<<<<<<< HEAD
-		String dbLogin = SqlConnector.getInstance().sendSelectQuery("SELECT login FROM alts WHERE `login` = '" + login + "'");
-=======
 		String dbLogin = SqlConnector.getInstance().sendSelectQuery("SELECT `login` FROM alts WHERE `login` = '" + login + "'");
->>>>>>> origin/Dev
 		if(dbLogin.equals("") || dbLogin == null){
 			System.out.println("Creating new alt for " + login + ". Primary: " + sender);
 			SqlConnector.getInstance().sendQuery("INSERT INTO alts VALUES ('" + login + "', '" + sender + "', '')");
@@ -125,30 +104,21 @@ public class StatsHandler {
 	}
 
 	private void processEmoticons(String channel, String sender, String login, String hostname, String message, String[] words) {
-<<<<<<< HEAD
-=======
 		int emoticonCount = 0;
->>>>>>> origin/Dev
 		if(login.equals("~Cadbury")) return;
 		for(String word : words){
 			for(int i = 0; i < Emoticons.emoticons.length; i++){
 				String emoticon = Emoticons.emoticons[i];
 				if(word.startsWith("http://")) continue;
 				if(word.equals(emoticon)){
-<<<<<<< HEAD
-=======
 					emoticonCount++;
->>>>>>> origin/Dev
 					SqlConnector.getInstance().tryIncrementLastUsedBy("emoticons", "emoticon", emoticon, "frequency", login, "'"+ emoticon + "', 1, '" + login + "'");
 				}
 			}
 		}
-<<<<<<< HEAD
-=======
 		if(emoticonCount > 4){
 			sendMessage(channel, "O.O I'm counting a lot of emoticons. You may want to inform baggerboot about this, as this might be a bug. Be sure to include the line you wrote: \"" + message + "\"");
 		}
->>>>>>> origin/Dev
 	}
 
 	private void processWords(String channel, String sender, String login, String hostname, String message, String[] words) {
@@ -158,10 +128,7 @@ public class StatsHandler {
 		
 		int nickCount = 0;
 		for (String word : words) {
-<<<<<<< HEAD
-=======
 			String wordCased = word;
->>>>>>> origin/Dev
 			word = word.toLowerCase();
 			for (User user : users) {
 				String nick = user.getNick().toLowerCase();
@@ -179,12 +146,6 @@ public class StatsHandler {
 					}
 				}
 			}
-<<<<<<< HEAD
-			if (!word.startsWith("http://")) {
-				word = word.replaceAll("[^A-Za-z0-9]", "");
-			} else {
-				// Add support for URLs here later
-=======
 			if (!word.startsWith("http://") && !word.startsWith("https://")) {
 				word = word.replaceAll("[^A-Za-z0-9]", "");
 			} else {
@@ -192,7 +153,6 @@ public class StatsHandler {
 				if(wordCased.endsWith("/")) wordCased = wordCased.substring(0, wordCased.length() -1);
 				wordCased = wordCased.replace("'", "''");
 				SqlConnector.getInstance().tryIncrementLastUsedBy("urls", "url", wordCased, "uses", login,"'" + wordCased + "', 1, '" + login + "'");
->>>>>>> origin/Dev
 				continue;
 			}
 			if (word.equals("")) {
@@ -258,12 +218,9 @@ public class StatsHandler {
 			SqlConnector.getInstance().tryIncrementVaria("evil_people_eaten");
 		}
 	}
-<<<<<<< HEAD
-=======
 
 	public void snagNextLine(String string) {
 		nextLineSnagLogin = string;
 		
 	}
->>>>>>> origin/Dev
 }
