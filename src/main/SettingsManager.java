@@ -59,12 +59,28 @@ public class SettingsManager {
 			try {
 				new File("settings.txt").createNewFile();
 			} catch (IOException e1) {
+<<<<<<< HEAD
 				BaggyBot.instance.addException(e);
+=======
+<<<<<<< HEAD
+				BaggyBot.instance.unreadExceptions.add(e1.getMessage());
+=======
+				BaggyBot.instance.addException(e);
+>>>>>>> origin/Dev
+>>>>>>> Master
 				e1.printStackTrace();
 			}
 			e.printStackTrace();
 		} catch (IOException e) {
+<<<<<<< HEAD
 			BaggyBot.instance.addException(e);
+=======
+<<<<<<< HEAD
+			BaggyBot.instance.unreadExceptions.add(e.getMessage());
+=======
+			BaggyBot.instance.addException(e);
+>>>>>>> origin/Dev
+>>>>>>> Master
 			e.printStackTrace();
 		}
 	}
