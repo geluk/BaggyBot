@@ -20,6 +20,9 @@ import org.jibble.pircbot.*;
 
 public class BaggyBot extends PircBot{
 	
+	private boolean disconnectRequested = false;
+	private short reconnectAttempts = 0;
+	
 	// Which prefix to use for commands
 	private String commandIdentifier = "-";
 	
@@ -27,7 +30,7 @@ public class BaggyBot extends PircBot{
 	
 	// The current version of the bot. Only increment this each time there is a release.
 	// Convention: (milestone).(major)[.(minor).[(revision/bugfix)]]
-	public static final String version = "1.9.1.1";
+	public static final String version = "1.9.4";
 	
 	// More debug output?
 	private static final boolean verbose = false;
@@ -103,6 +106,27 @@ public class BaggyBot extends PircBot{
 	}
 	public void onAction(String sender, String login, String hostname, String target, String action){
 		StatsHandler.getInstance().processAction(sender,login,hostname,target,action);
+	}
+	
+	public void onDisconnect(){
+		if(!disconnectRequested){
+			Logger.log("Connection lost! Attempting to reconnect.");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			try {
+				connect("irc.esper.net");
+			} catch (NickAlreadyInUseException e) {
+				setName(getName() + "_");
+				e.printStackTrace();
+			} catch (IOException e) {
+				onDisconnect();
+			} catch (IrcException e){
+				shutdown();
+			}
+		}
 	}
 	
 	// Gets executed whenever an IRC message is sent
