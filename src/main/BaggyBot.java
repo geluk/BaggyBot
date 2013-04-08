@@ -30,7 +30,7 @@ public class BaggyBot extends PircBot{
 	
 	// The current version of the bot. Only increment this each time there is a release.
 	// Convention: (milestone).(major)[.(minor).[(revision/bugfix)]]
-	public static final String version = "1.9.4";
+	public static final String version = "1.9.5.1";
 	
 	// More debug output?
 	private static final boolean verbose = false;

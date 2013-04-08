@@ -100,18 +100,35 @@ public class CommandHandler {
 				sendMessage(channel, "For help on a specific command, use -help <command>");
 			}else if(params[1].equals("get")){
 				if(params.length == 2)
-				sendMessage(channel, "Returns statistics data. Available parameters: quote, lines, glines. for more information, use -help get <parameter>");
+				sendMessage(channel, "Returns statistics data. Available parameters: quote, lines, glines, swears. for more information, use -help get <parameter>");
 				else if(params[2].equals("quote"))
 				sendMessage(channel, "Returns the random quote for that user. Usage: -get quote <username>");
 				else if(params[2].equals("lines"))
 				sendMessage(channel, "Returns the line count for that user. Usage: -get lines <username>");
 				else if(params[2].equals("glines"))
 				sendMessage(channel, "Returns the global line count. No other parameters required. Usage: -get glines");
+				else if(params[2].equals("swears"))
+				sendMessage(channel, "Returns a user's swear count. Usage: -get swears <username>");
 				
 			}else if(params[1].equals("rem")){
 				sendMessage(channel, "Allows you to save rems. Uses Cadbury's syntax. Additionally, you can use the {SENDER} variabele to put the name of the person who executed the command in the message.");
+			}else if(params[1].equals("help")){
+				if(params.length == 2){
+					sendMessage(channel, "Yo dawg..");
+				}else if(params[2].equals("help")){
+					if(params.length == 3){
+						sendMessage(channel, "There's nothing here!");
+					}else if(params[3].equals("help")){
+						if(params.length == 4){
+							sendMessage(channel, "Quit wasting your time and start doing something useful with your life.");
+						}else if(params[4].equals("help")){
+							if(params.length == 5){
+								sendMessage(channel, "No, seriously. I'm not kidding. Why are you still here.");
+							}
+						}
+					}
+				}
 			}
-		
 		}else if(command.startsWith("info") || command.startsWith("help") || command.startsWith("version")){
 			BaggyBot.instance.sendMessage(channel, "StatsBot " + BaggyBot.version +" - made by baggerboot. Stats page: http://jgeluk.net/stats/ - To see a list of help topics, use the '-help topics' command.");
 		
@@ -144,6 +161,8 @@ public class CommandHandler {
 					sendMessage(channel, sender + ", " + params[2] + "'s random quote: \"" + SqlConnector.getInstance().sendSelectQuery("SELECT `random_quote` FROM `users` LEFT JOIN alts ON nick = login WHERE (`primary` = '" + params[2] + "' OR `additional` LIKE '%" + params[2] + "%')") + "\"");
 				}else if(params[1].equals("words")){
 					sendMessage(channel, sender + ", " + params[2] + " has written " + SqlConnector.getInstance().sendSelectQuery("SELECT `words` FROM `users` LEFT JOIN alts ON nick = login WHERE (`primary` = '" + params[2] + "' OR `additional` LIKE '%" + params[2] + "%')") + " words so far.");
+				}else if(params[1].equals("swears")){
+					sendMessage(channel, sender + ", " + params[2] + "'s swear count: " + SqlConnector.getInstance().sendSelectQuery("SELECT `profanities` FROM `users` LEFT JOIN alts ON nick = login WHERE (`primary` = '" + params[2] + "' OR `additional` LIKE '%" + params[2] + "%')"));
 				}
 			}
 			
